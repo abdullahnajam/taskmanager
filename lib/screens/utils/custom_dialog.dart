@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:provider/provider.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
+import 'package:taskmanager/provider/user_data_provider.dart';
 import 'package:taskmanager/screens/utils/constants.dart';
 
 import '../../api/notification_service.dart';
@@ -40,22 +42,15 @@ Future<void> showSettingDialog(BuildContext context) async {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    decoration: const BoxDecoration(
-                      //color: Color(0xffC3C1C1).withOpacity(0.5),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        )
-                    ),
-                    child: Stack(
-                      children: [
 
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Container(
-                            padding: const EdgeInsets.only(top: 5,right: 10,bottom: 5),
-                            child: InkWell(
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(10),
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(child: Text('Time Setting',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),),
+                            InkWell(
                               child: const CircleAvatar(
                                 radius: 12,
                                 backgroundColor: Colors.black,
@@ -63,16 +58,8 @@ Future<void> showSettingDialog(BuildContext context) async {
                               ),
                               onTap: ()=>Navigator.pop(context),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.all(10),
-                      children: [
-                        const Text('Time Setting',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),
+                          ],
+                        ),
                         const SizedBox(height: 10,),
                         const Text(loremIpsum),
                         const SizedBox(height: 10,),
@@ -181,14 +168,19 @@ Future<void> showAddTimeBlockDialog(BuildContext context) async {
                           topRight: Radius.circular(10),
                         )
                     ),
-                    child: Stack(
-                      children: [
 
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Container(
-                            padding: const EdgeInsets.only(top: 5,right: 10,bottom: 5),
-                            child: InkWell(
+                  ),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(10),
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child:const Text('Add Timeblock',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),
+
+                            ),
+                            InkWell(
                               child: const CircleAvatar(
                                 radius: 12,
                                 backgroundColor: Colors.black,
@@ -196,16 +188,8 @@ Future<void> showAddTimeBlockDialog(BuildContext context) async {
                               ),
                               onTap: ()=>Navigator.pop(context),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.all(10),
-                      children: [
-                        const Text('Add Timeblock',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),
+                          ],
+                        ),
                         const SizedBox(height: 10,),
 
                         ExpansionTile(
@@ -397,7 +381,7 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
+                   /* Container(
                       decoration: const BoxDecoration(
                         //color: Color(0xffC3C1C1).withOpacity(0.5),
                           borderRadius: BorderRadius.only(
@@ -424,12 +408,29 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                           )
                         ],
                       ),
-                    ),
+                    ),*/
                     Expanded(
                       child: ListView(
                         padding: const EdgeInsets.all(10),
                         children: [
-                          const Text('Add things to do with notification',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: const Text('Add things to do with notification',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),
+                              ),
+                              Container(
+                                //padding: const EdgeInsets.only(top: 5,right: 5,bottom: 5),
+                                child: InkWell(
+                                  child: const CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: Colors.black,
+                                    child: Icon(Icons.close,color: greyColor,size: 12,),
+                                  ),
+                                  onTap: ()=>Navigator.pop(context),
+                                ),
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 10,),
 
                           ExpansionTile(
@@ -496,8 +497,10 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                                           notificationId++;
                                         });
                                       });
+                                      final provider = Provider.of<UserDataProvider>(context, listen: false);
+
                                       await FirebaseFirestore.instance.collection('reminder').add({
-                                        "userId":'',
+                                        "userId":provider.userId,
                                         "startTime":selectedStartDate.millisecondsSinceEpoch,
                                         "endTime":selectedEndDate.millisecondsSinceEpoch,
                                         "notificationId":notificationId,
@@ -580,39 +583,29 @@ Future<void> showStartTimerDialog(BuildContext context) async {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    decoration: const BoxDecoration(
-                      //color: Color(0xffC3C1C1).withOpacity(0.5),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        )
-                    ),
-                    child: Stack(
-                      children: [
 
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Container(
-                            padding: const EdgeInsets.only(top: 5,right: 10,bottom: 5),
-                            child: InkWell(
-                              child: const CircleAvatar(
-                                radius: 12,
-                                backgroundColor: Colors.black,
-                                child: Icon(Icons.close,color: greyColor,size: 12,),
-                              ),
-                              onTap: ()=>Navigator.pop(context),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
                   Expanded(
                     child: ListView(
                       padding: const EdgeInsets.all(10),
                       children: [
-                        const Text('Start Timer',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: const Text('Start Timer',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),
+                            ),
+                            Container(
+                              //padding: const EdgeInsets.only(top: 5,right: 5,bottom: 5),
+                              child: InkWell(
+                                child: const CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: Colors.black,
+                                  child: Icon(Icons.close,color: greyColor,size: 12,),
+                                ),
+                                onTap: ()=>Navigator.pop(context),
+                              ),
+                            ),
+                          ],
+                        ),
 
                         const SizedBox(height: 10,),
                         ExpansionTile(
@@ -634,7 +627,7 @@ Future<void> showStartTimerDialog(BuildContext context) async {
 
 
                           children: <Widget>[
-                            Row(
+                            /*Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Padding(
@@ -642,7 +635,7 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                                   child: Text('hh : mm :ss',style: TextStyle(color: Colors.grey.shade700),),
                                 ),
                               ],
-                            ),
+                            ),*/
                             SizedBox(height: 10,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,

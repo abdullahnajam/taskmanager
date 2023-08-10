@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart' as kakao;
+import 'package:provider/provider.dart';
 import 'package:taskmanager/screens/subscribe_screen.dart';
 
+import '../provider/user_data_provider.dart';
 import 'navigators/bottom_nav.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,13 +20,15 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<UserDataProvider>(context, listen: false);
+
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 30,),
-            Image.asset('assets/images/icon-round.png',height: 100,),
+            Image.asset('assets/images/icon.png',height: 100,),
             const SizedBox(height: 20,),
             const Text('Task Manager',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
             Expanded(
@@ -79,6 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       );
 
                       await FirebaseAuth.instance.signInWithCredential(credential).then((value){
+                        provider.setUserId(value.user!.uid);
                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Subscribe()));
 
                       }).onError((error, stackTrace){
@@ -120,6 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
                       await FirebaseAuth.instance.signInWithProvider(appleProvider).then((value){
+                        provider.setUserId(value.user!.uid);
                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Subscribe()));
 
                       }).onError((error, stackTrace){
@@ -159,8 +165,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   InkWell(
                     onTap: ()async{
                       try {
-                        OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
-                        print('Login succeeds. ${token.accessToken}');
+                        await kakao.UserApi.instance.loginWithKakaoAccount().then((value)async{
+
+                          kakao.User user=await kakao.UserApi.instance.me();
+                          provider.setUserId(user.id.toString());
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Subscribe()));
+
+                        }).onError((error, stackTrace){
+                          CoolAlert.show(
+                            context: context,
+                            type: CoolAlertType.error,
+                            text: error.toString(),
+                          );
+                        });
+                        /*print('Login succeeds. ${token.accessToken}');
+                        await FirebaseAuth.instance.signInWithCustomToken(token.accessToken).then((value){
+                          print(value.user!.uid);
+                          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Subscribe()));
+
+                        }).onError((error, stackTrace){
+                          CoolAlert.show(
+                            context: context,
+                            type: CoolAlertType.error,
+                            text: error.toString(),
+                          );
+                        });*/
                       } catch (e) {
                         print('Login fails. $e');
                       }
@@ -196,6 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.all(20),
               child: InkWell(
                 onTap: (){
+                  provider.setUserId('none');
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Subscribe()));
 
                 },

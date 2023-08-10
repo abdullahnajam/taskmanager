@@ -26,7 +26,7 @@ class _TimerScreenState extends State<TimerScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(30),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -35,8 +35,9 @@ class _TimerScreenState extends State<TimerScreen> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20,right: 20),
+            Container(
+              width: MediaQuery.of(context).size.width*0.7,
+              padding: const EdgeInsets.only(left: 20,right: 20,top: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

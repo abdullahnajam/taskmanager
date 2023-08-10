@@ -34,8 +34,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
-        child: Lottie.asset('assets/json/splash.json'),
+        child: Image.asset('assets/images/splash.gif',height: 300,fit: BoxFit.cover,),
       ),
     );
   }

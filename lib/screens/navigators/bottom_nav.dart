@@ -96,7 +96,7 @@ class _BottomNavigationState extends State<BottomNavBar>{
                     Image.asset("assets/images/timer_fill.png",height: 25)
                   else
                     Image.asset("assets/images/time.png",height: 25),
-                  const Text('Watch')
+                  const Text('Timer')
                 ],
               ),
             ),

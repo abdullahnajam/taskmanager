@@ -68,12 +68,12 @@ class _SubscribeState extends State<Subscribe> {
                   personalPackage(
                       productID: productLists[0],
                       title: 'Monthly Subscription',
-                      price: '2.99'
+                      price: '2.5'
                   ),
                   personalPackage(
                       productID: productLists[1],
                       title: 'Yearly Subscription',
-                      price: '29.9'
+                      price: '25'
                   ),
                   /*if(FirebaseAuth.instance.currentUser==null || provider.userData!.type=='Healthcare')
                               providerPackage(productLists[2])*/

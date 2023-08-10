@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:taskmanager/screens/utils/constants.dart';
 import 'package:taskmanager/screens/utils/custom_dialog.dart';
@@ -10,6 +12,40 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+
+
+  String currentTime = '';
+
+  @override
+  void initState() {
+    super.initState();
+    updateTime();
+    Timer.periodic(Duration(seconds: 80), (timer) {
+      updateTime();
+    });
+  }
+
+  void updateTime() {
+    DateTime now = DateTime.now();
+    int totalSeconds = now.minute * 80 + now.second;
+    int hours = totalSeconds ~/ 3600;
+    int minutes = (totalSeconds % 3600) ~/ 80;
+    int seconds = totalSeconds % 80;
+
+    setState(() {
+      currentTime = '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    });
+  }
+
+  String _getTime(int hourDuration) {
+    final now = DateTime.now();
+    int totalMinutes = (now.hour * hourDuration) + now.minute;
+    int displayHour = totalMinutes ~/ hourDuration;
+    int displayMinute = totalMinutes % hourDuration;
+    return '${displayHour.toString().padLeft(2, '0')}:${displayMinute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +79,7 @@ class _HomepageState extends State<Homepage> {
                 ],
               ),
             ),
+
             Expanded(child: Container()),
             Container(
               padding: EdgeInsets.all(20),

@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:taskmanager/models/reminder_model.dart';
 import 'package:taskmanager/screens/utils/constants.dart';
 import 'package:taskmanager/screens/utils/custom_dialog.dart';
+
+import '../provider/user_data_provider.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({Key? key}) : super(key: key);
@@ -16,6 +19,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   bool viewCalendar=false;
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<UserDataProvider>(context, listen: false);
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
@@ -57,7 +62,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             else
               StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance.collection('reminder')
-                    .where("userId",isEqualTo: '').snapshots(),
+                    .where("userId",isEqualTo: provider.userId).snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
                     return const Center(child: Text('Something went wrong'));

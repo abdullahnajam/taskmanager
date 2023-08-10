@@ -2,6 +2,8 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:provider/provider.dart';
+import 'package:taskmanager/provider/user_data_provider.dart';
 import 'package:taskmanager/screens/splash_screen.dart';
 
 void main()async{
@@ -52,13 +54,23 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Task Manager',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-        useMaterial3: true,
-      ),
-      home: SplashScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<UserDataProvider>(
+          create: (_) => UserDataProvider(),
+        ),
+
+
+      ],
+      child: MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.orange,
+        ),
+        debugShowCheckedModeBanner: false,
+        title: 'PelvicTron',
+
+        home: SplashScreen(),
+      )
     );
   }
 }

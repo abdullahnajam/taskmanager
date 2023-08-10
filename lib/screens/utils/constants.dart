@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 const primaryColor=Colors.black;
-const greyColor=Color(0xffC3C1C1);
+const greyColor=Colors.white;
+//const greyColor=Color(0xffC3C1C1);
 
 const loremIpsum='Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum.';
 
