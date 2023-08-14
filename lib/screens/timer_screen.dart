@@ -30,7 +30,7 @@ class _TimerScreenState extends State<TimerScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('32 : 41 : 80',style: TextStyle(fontFamily: 'Digital',fontWeight: FontWeight.w500,fontSize: 60),),
+                  Text('0 : 0 : 0',style: TextStyle(fontFamily: 'Digital',fontWeight: FontWeight.w500,fontSize: 60),),
 
                 ],
               ),
@@ -70,7 +70,7 @@ class _TimerScreenState extends State<TimerScreen> {
                           border: Border.all(color: Colors.black)
                       ),
                       child: Center(
-                        child: Text('1 Hour',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
+                        child: Text('2 Hour',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
                       )
                   ),
                 )
@@ -87,7 +87,7 @@ class _TimerScreenState extends State<TimerScreen> {
                           border: Border.all(color: Colors.black)
                       ),
                       child: Center(
-                        child: Text('1 Hour',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
+                        child: Text('3 Hour',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
                       )
                   ),
                 ),
@@ -99,7 +99,7 @@ class _TimerScreenState extends State<TimerScreen> {
                           border: Border.all(color: Colors.black)
                       ),
                       child: Center(
-                        child: Text('1 Hour',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
+                        child: Text('5 Hour',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500),),
                       )
                   ),
                 )

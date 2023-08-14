@@ -6,6 +6,8 @@ import 'package:taskmanager/models/reminder_model.dart';
 import 'package:taskmanager/screens/utils/constants.dart';
 import 'package:taskmanager/screens/utils/custom_dialog.dart';
 
+import '../api/firebase_api.dart';
+import '../models/meeting_model.dart';
 import '../provider/user_data_provider.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -17,6 +19,26 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> {
   bool viewCalendar=false;
+  Future<List<Meeting>> _getDataSource(String userId) async{
+    final List<Meeting> meetings = <Meeting>[];
+    DateTime today=DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+    await FirebaseFirestore.instance.collection('reminder').where('userId',isEqualTo: userId).get().then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
+        ReminderModel model=ReminderModel.fromMap(data, doc.reference.id);
+        final DateTime startTime = DateTime.fromMillisecondsSinceEpoch(model.startTime);
+        final DateTime endTime = DateTime.fromMillisecondsSinceEpoch(model.endTime);
+        print('start $startTime end $endTime');
+
+        meetings.add(Meeting(model.todo, startTime, endTime, endTime.isBefore(today)?Colors.green:Colors.yellow, false));
+      });
+    });
+
+
+
+    return meetings;
+  }
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<UserDataProvider>(context, listen: false);
@@ -46,23 +68,54 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         viewCalendar=!viewCalendar;
                       });
                     },
-                    child: Image.asset('assets/images/switch_calendar.png',height: 30,),
+                    child: Icon(Icons.calendar_month_outlined,color: Colors.black,size: 30,)
                   ),
                 )
               ],
             ),
 
             if(viewCalendar)
-              Container(
-                height: MediaQuery.of(context).size.height*0.65,
-                child: SfCalendar(
-                  view: CalendarView.month,
-                ),
+              FutureBuilder<List<Meeting>>(
+                  future: _getDataSource(provider.userId!),
+                  builder: (context, AsyncSnapshot<List<Meeting>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    else {
+                      if (snapshot.hasError) {
+                        print("error ${snapshot.error}");
+                        return const Center(
+                          child: Text("Something went wrong"),
+                        );
+                      }
+
+
+                      else {
+
+                        return  Container(
+                          height: MediaQuery.of(context).size.height*0.65,
+                          child: SfCalendar(
+                            dataSource: MeetingDataSource(snapshot.data!),
+                            view: CalendarView.month,
+                            initialDisplayDate: DateTime.now(),
+                            monthViewSettings: MonthViewSettings(
+
+                              showAgenda: true,
+                                appointmentDisplayMode: MonthAppointmentDisplayMode.appointment),
+                          ),
+                        );
+                      }
+                    }
+                  }
               )
+
             else
               StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance.collection('reminder')
-                    .where("userId",isEqualTo: provider.userId).snapshots(),
+                    .where("userId",isEqualTo: provider.userId)
+                    .where("status",isNotEqualTo: 'finished').snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
                     return const Center(child: Text('Something went wrong'));
@@ -78,7 +131,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     return const Padding(
                       padding: EdgeInsets.all(10),
                       child: Center(
-                        child: Text('No Schedule Found'),
+                        child: Text(''),
                       ),
                     );
                   }
