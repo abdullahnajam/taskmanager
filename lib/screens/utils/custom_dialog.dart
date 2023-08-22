@@ -9,15 +9,20 @@ import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 import 'package:taskmanager/api/firebase_api.dart';
+import 'package:taskmanager/api/shared_pref_api.dart';
 import 'package:taskmanager/models/time_block_model.dart';
 import 'package:taskmanager/provider/user_data_provider.dart';
+import 'package:taskmanager/screens/navigators/bottom_nav.dart';
 import 'package:taskmanager/screens/utils/constants.dart';
 
 import '../../api/notification_service.dart';
+import '../../api/time_api.dart';
+import '../../provider/timer_provider.dart';
+import '../navigators/tabbed_bottom_nav.dart';
 
 Future<void> showSettingDialog(BuildContext context) async {
 
-
+  int hours=await SharedPrefHelper.getSeconds();
   return showDialog<void>(
     context: context,
     barrierDismissible: true, // user must tap button!
@@ -36,7 +41,7 @@ Future<void> showSettingDialog(BuildContext context) async {
             elevation: 2,
 
             child: Container(
-              height: MediaQuery.of(context).size.height*0.4,
+              height: MediaQuery.of(context).size.height*0.35,
               width: MediaQuery.of(context).size.width*0.9,
               decoration: BoxDecoration(
                   color: greyColor,
@@ -68,7 +73,7 @@ Future<void> showSettingDialog(BuildContext context) async {
                             const SizedBox(height: 10,),
                             const Text(loremIpsum),
                             const SizedBox(height: 10,),
-                            ListTile(
+                            /*ListTile(
                               onTap:(){
                                 provider.setTime(16);
                               },
@@ -81,14 +86,46 @@ Future<void> showSettingDialog(BuildContext context) async {
                               },
                               leading: provider.time==32?Image.asset('assets/images/ic_radio_on.png',color: Colors.orange,):Image.asset('assets/images/ic_radio_off.png'),
                               title: const Text('32 Hours'),
+                            ),*/
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: InkWell(
+                                onTap: (){
+                                  provider.setTime(hours);
+                                },
+                                child:  Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    /*(provider.time!=32 && provider.time!=16)?Image.asset('assets/images/ic_radio_on.png',color: Colors.orange,):Image.asset('assets/images/ic_radio_off.png'),
+                                    SizedBox(width: 20,),*/
+                                    NumberPicker(
+                                      zeroPad: true,
+                                      value: hours,
+                                      minValue: 0,
+                                      itemHeight: 25,
+                                      itemWidth: 50,
+                                      maxValue: 48,
+                                      textStyle: TextStyle(fontSize: 16),
+                                      selectedTextStyle: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),
+                                      onChanged: (value) => setState(() => hours = value),
+                                    ),
+                                    Text('Hours',style:TextStyle(fontSize: 20,fontWeight: FontWeight.w500))
+                                  ],
+                                ),
+                              ),
                             ),
+
                             const SizedBox(height: 10,),
                             Row(
                               children: [
                                 Expanded(
                                   child: InkWell(
                                     onTap: (){
+                                      provider.setTime(hours);
                                       Navigator.pop(context);
+                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => TabbedBottomNavBar()));
+
                                     },
                                     child: Container(
                                       height: 50,
@@ -143,6 +180,7 @@ Future<void> showAddTimeBlockDialog(BuildContext context) async {
   var _todoController=TextEditingController();
   int _currentValue = 0;
   int _currentValue1 = 0;
+  int maxHours=await SharedPrefHelper.getSeconds();
   final _formKey = GlobalKey<FormState>();
   return showDialog<void>(
     context: context,
@@ -230,15 +268,7 @@ Future<void> showAddTimeBlockDialog(BuildContext context) async {
 
 
                             children: <Widget>[
-                              /*Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 15),
-                                    child: Text('hh : mm :ss',style: TextStyle(color: Colors.grey.shade700),),
-                                  ),
-                                ],
-                              ),*/
+
                               SizedBox(height: 10,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -248,11 +278,12 @@ Future<void> showAddTimeBlockDialog(BuildContext context) async {
                                     minValue: 0,
                                     itemHeight: 25,
                                     itemWidth: 50,
-                                    maxValue: 32,
+                                    maxValue: maxHours-1,
                                     textStyle: TextStyle(fontSize: 12),
                                     selectedTextStyle: TextStyle(fontSize: 15),
                                     onChanged: (value) => setState(() => _currentValue = value),
                                   ),
+                                  Text('hours'),
                                   NumberPicker(
                                     value: _currentValue1,
                                     minValue: 0,
@@ -263,6 +294,7 @@ Future<void> showAddTimeBlockDialog(BuildContext context) async {
                                     selectedTextStyle: TextStyle(fontSize: 15),
                                     onChanged: (value) => setState(() => _currentValue1 = value),
                                   ),
+                                  Text('minutes'),
 
                                 ],
                               )
@@ -352,47 +384,23 @@ Future<void> showAddTimeBlockDialog(BuildContext context) async {
 }
 
 Future<void> showAddTodoDialog(BuildContext context) async {
+  final provider = Provider.of<UserDataProvider>(context, listen: false);
+
   DateTime selectedStartDate = DateTime.now();
   DateTime selectedEndDate = DateTime.now();
-  var _startController=TextEditingController();
-  var _endController=TextEditingController();
 
 
-  Future<void> _selectStartDate(BuildContext context) async {
 
-    DatePicker.showTimePicker(context,
-        showTitleActions: true,
+  int maxHours=await SharedPrefHelper.getSeconds();
 
-        currentTime: DateTime.now(),
-        onChanged: (date) {
-          print('change $date');
-          selectedStartDate=date;
-          _startController.text=dtf.format(date);
-        }, onConfirm: (date) {
-        selectedStartDate=date;
-        _startController.text=dtf.format(date);
-        },
+  DateTime alteredTime=await TimeApi.convertToAlteredTime(DateTime.now());
 
-    );
-  }
+  int _currentValue = alteredTime.hour;
+  int _currentValue1 =  alteredTime.minute;
+  int _currentEndValue =  alteredTime.hour;
+  int _currentEndValue1 =  alteredTime.minute;
 
-  Future<void> _selectEndDate(BuildContext context) async {
-    DatePicker.showTimePicker(context,
-      showTitleActions: true,
-      currentTime: DateTime.now(),
-      onChanged: (date) {
-        print('change $date');
-        selectedEndDate=date;
-        _endController.text=dtf.format(date);
-      }, onConfirm: (date) {
-        selectedEndDate=date;
-        _endController.text=dtf.format(date);
-      },
-
-    );
-  }
   TimeBlockModel? selectedObject;
-  final provider = Provider.of<UserDataProvider>(context, listen: false);
   List<TimeBlockModel> dropdownData = [];
   await FirebaseApi.getTimeBlocks(provider.userId!).then((data) {
     dropdownData = data;
@@ -421,7 +429,7 @@ Future<void> showAddTodoDialog(BuildContext context) async {
 
             child: Container(
               padding: EdgeInsets.all(10),
-              height: MediaQuery.of(context).size.height*0.4,
+              height: MediaQuery.of(context).size.height*0.68,
               width: MediaQuery.of(context).size.width*0.9,
               decoration: BoxDecoration(
                   color: greyColor,
@@ -432,34 +440,6 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                   /* Container(
-                      decoration: const BoxDecoration(
-                        //color: Color(0xffC3C1C1).withOpacity(0.5),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                          )
-                      ),
-                      child: Stack(
-                        children: [
-
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Container(
-                              padding: const EdgeInsets.only(top: 5,right: 10,bottom: 5),
-                              child: InkWell(
-                                child: const CircleAvatar(
-                                  radius: 12,
-                                  backgroundColor: Colors.black,
-                                  child: Icon(Icons.close,color: greyColor,size: 12,),
-                                ),
-                                onTap: ()=>Navigator.pop(context),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),*/
                     Expanded(
                       child: ListView(
                         padding: const EdgeInsets.all(10),
@@ -470,7 +450,6 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                                 child: const Text('Add things to do with notification',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),
                               ),
                               Container(
-                                //padding: const EdgeInsets.only(top: 5,right: 5,bottom: 5),
                                 child: InkWell(
                                   child: const CircleAvatar(
                                     radius: 12,
@@ -484,52 +463,13 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                           ),
                           const SizedBox(height: 10,),
 
+
+
                           ExpansionTile(
                             tilePadding: EdgeInsets.zero,
                             title: Text('Which thing to do'),
 
                             children: <Widget>[
-                              /*FutureBuilder<List<TimeBlockModel>>(
-                                  future: FirebaseApi.getTimeBlocks(provider.userId!),
-                                  builder: (context, AsyncSnapshot<List<TimeBlockModel>> snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
-                                    }
-                                    else {
-                                      if (snapshot.hasError) {
-                                        print("error ${snapshot.error}");
-                                        return const Center(
-                                          child: Text("Something went wrong"),
-                                        );
-                                      }
-                                      else if(snapshot.data!.isEmpty){
-                                        return const Center(
-                                          child: Text("No Workshops"),
-                                        );
-                                      }
-
-                                      else {
-
-                                        return  DropdownButton<TimeBlockModel>(
-                                          value: selectedObject,
-                                          onChanged: (newValue) {
-                                            setState(() {
-                                              selectedObject = newValue;
-                                            });
-                                          },
-                                          items: snapshot.data!.map((obj) {
-                                            return DropdownMenuItem<TimeBlockModel>(
-                                              value: obj,
-                                              child: Text(obj.todo),
-                                            );
-                                          }).toList(),
-                                        );
-                                      }
-                                    }
-                                  }
-                              ),*/
                               DropdownButton<TimeBlockModel>(
                                 value: selectedObject,
                                 isExpanded: true,
@@ -545,40 +485,87 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                                   );
                                 }).toList(),
                               ),
-                              TextFormField(
-                                onTap: (){
-                                  _selectStartDate(context);
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please select a time';
-                                  }
-                                  return null;
-                                },
-                                readOnly: true,
-                                controller: _startController,
-                                decoration: new InputDecoration(
-                                  hintText: "Start Time",
-
-                                ),
+                              const SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text('Real World Time : ${f.format(DateTime.now())}',style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w500,fontSize: 17),),
+                                ],
                               ),
-                              SizedBox(height: 10,),
-                              TextFormField(
-                                onTap: (){
-                                  _selectEndDate(context);
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please select a time';
-                                  }
-                                  return null;
-                                },
-                                readOnly: true,
-                                controller: _endController,
-                                decoration: new InputDecoration(
-                                  hintText: "End Time",
+                              const SizedBox(height: 10,),
+                              ExpansionTile(
+                                tilePadding: EdgeInsets.zero,
+                                title: Text('Start Time'),
+                                childrenPadding: EdgeInsets.zero,
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      NumberPicker(
+                                        value: _currentValue,
+                                        minValue: 0,
+                                        itemHeight: 25,
+                                        itemWidth: 50,
+                                        maxValue: maxHours-1,
+                                        textStyle: TextStyle(fontSize: 12),
+                                        selectedTextStyle: TextStyle(fontSize: 15),
+                                        onChanged: (value) => setState(() => _currentValue = value),
+                                      ),
+                                      Text('hours'),
+                                      NumberPicker(
+                                        value: _currentValue1,
+                                        minValue: 0,
+                                        itemHeight: 25,
+                                        itemWidth: 50,
+                                        maxValue: 59,
+                                        textStyle: TextStyle(fontSize: 12),
+                                        selectedTextStyle: TextStyle(fontSize: 15),
+                                        onChanged: (value) => setState(() => _currentValue1 = value),
+                                      ),
+                                      Text('minutes'),
+                                    ],
+                                  )
+                                ],
+                              ),
 
-                                ),
+
+
+                              ExpansionTile(
+                                tilePadding: EdgeInsets.zero,
+                                title: Text('End Time'),
+
+
+                                children: <Widget>[
+
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      NumberPicker(
+                                        value: _currentEndValue,
+                                        minValue: 0,
+                                        itemHeight: 25,
+                                        itemWidth: 50,
+                                        maxValue: maxHours-1,
+                                        textStyle: TextStyle(fontSize: 12),
+                                        selectedTextStyle: TextStyle(fontSize: 15),
+                                        onChanged: (value) => setState(() => _currentEndValue = value),
+                                      ),
+                                      Text('hours'),
+                                      NumberPicker(
+                                        value: _currentEndValue1,
+                                        minValue: 0,
+                                        itemHeight: 25,
+                                        itemWidth: 50,
+                                        maxValue: 59,
+                                        textStyle: TextStyle(fontSize: 12),
+                                        selectedTextStyle: TextStyle(fontSize: 15),
+                                        onChanged: (value) => setState(() => _currentEndValue1 = value),
+                                      ),
+                                      Text('minutes')
+
+                                    ],
+                                  )
+                                ],
                               ),
                             ],
                           ),
@@ -603,19 +590,35 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                                           });
                                         });
                                         final provider = Provider.of<UserDataProvider>(context, listen: false);
-
+                                        var now=DateTime.now();
+                                        /*selectedStartDate=DateTime(now.year,now.month,now.day,)*/
+                                        selectedStartDate=await TimeApi.convertScheduleTime(_currentValue, _currentValue1);
+                                        selectedEndDate=await TimeApi.convertScheduleTime(_currentEndValue, _currentEndValue1);
+                                        print('start date $selectedStartDate : end date $selectedEndDate');
                                         await FirebaseFirestore.instance.collection('reminder').add({
                                           "userId":provider.userId,
                                           "startTime":selectedStartDate.millisecondsSinceEpoch,
                                           "endTime":selectedEndDate.millisecondsSinceEpoch,
+                                          "formatedStartTime":'$_currentValue:$_currentValue1',
+                                          "formatedEndTime":'$_currentEndValue:$_currentEndValue1',
                                           "notificationId":notificationId,
                                           "todo":selectedObject!.todo,
                                           "todoId":selectedObject!.id,
                                           "status":'in progress',
                                         }).then((value)async{
-                                          DateTime start=await FirebaseApi.convertToStandardTime(selectedStartDate);
-                                          DateTime end=await FirebaseApi.convertToStandardTime(selectedEndDate);
-                                          await Alarm.init();
+
+                                          NotificationService.showAlarmNotification(
+                                              title: 'Start ${selectedObject!.todo}',
+                                              id: notificationId,
+                                              scheduleTime: selectedStartDate
+                                          );
+                                          NotificationService.showAlarmNotification(
+                                              title: 'End ${selectedObject!.todo}',
+                                              id: int.parse('${notificationId}0101'),
+                                              scheduleTime: selectedEndDate
+                                          );
+
+                                          /*await Alarm.init();
                                           final alarmSettings = AlarmSettings(
                                             id: notificationId,
                                             dateTime: selectedStartDate,
@@ -637,8 +640,8 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                                             enableNotificationOnKill: true,
                                           );
                                           await Alarm.set(alarmSettings: alarmSettings);
-                                          await Alarm.set(alarmSettings: alarmSettings2);
-                                          NotificationService().showScheduledNotification(notificationId, "Pelvic Reminder",  selectedEndDate);
+                                          await Alarm.set(alarmSettings: alarmSettings2);*/
+                                          //NotificationService().showScheduledNotification(notificationId, "Reminder",  selectedEndDate);
                                           pr.close();
                                           Navigator.pop(context);
                                         }).onError((error, stackTrace){
@@ -711,9 +714,21 @@ Future<void> showAddTodoDialog(BuildContext context) async {
 
 Future<void> showStartTimerDialog(BuildContext context) async {
 
-  int _currentValue = 22;
-  int _currentValue1 = 3;
-  int _currentValue2 = 3;
+  int _currentValue1 = 0;
+  int _currentValue2 = 0;
+  int _currentValue=1;
+  int maxHours=await SharedPrefHelper.getSeconds();
+  int maxSeconds=await SharedPrefHelper.getSecondsInMinute();
+
+  TimeBlockModel? selectedObject;
+  List<TimeBlockModel> dropdownData = [];
+  final provider = Provider.of<UserDataProvider>(context, listen: false);
+  await FirebaseApi.getTimeBlocks(provider.userId!).then((data) {
+    dropdownData = data;
+    if(data.isNotEmpty)
+      selectedObject=data.first;
+  });
+
   return showDialog<void>(
     context: context,
     barrierDismissible: true, // user must tap button!
@@ -771,12 +786,22 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                           title: Text('Which thing to do'),
 
                           children: <Widget>[
-                            TextField(
-                              decoration: new InputDecoration(
-                                hintText: "Enter Todos",
-
-                              ),
-                            )
+                            DropdownButton<TimeBlockModel>(
+                              value: selectedObject,
+                              isExpanded: true,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  selectedObject = newValue;
+                                });
+                              },
+                              items: dropdownData.map((obj) {
+                                return DropdownMenuItem<TimeBlockModel>(
+                                  value: obj,
+                                  child: Text(obj.todo),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 10,),
                           ],
                         ),
                         ExpansionTile(
@@ -803,7 +828,7 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                                   minValue: 0,
                                   itemHeight: 25,
                                   itemWidth: 50,
-                                  maxValue: 32,
+                                  maxValue: maxHours,
                                   textStyle: TextStyle(fontSize: 12),
                                   selectedTextStyle: TextStyle(fontSize: 15),
                                   onChanged: (value) => setState(() => _currentValue = value),
@@ -823,7 +848,7 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                                   minValue: 0,
                                   itemHeight: 25,
                                   itemWidth: 50,
-                                  maxValue: 80,
+                                  maxValue: maxSeconds,
                                   textStyle: TextStyle(fontSize: 12),
                                   selectedTextStyle: TextStyle(fontSize: 15),
                                   onChanged: (value) => setState(() => _currentValue2 = value),
@@ -843,6 +868,15 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                             Expanded(
                               flex: 1,
                               child: InkWell(
+                                onTap: (){
+                                  final provider = Provider.of<TimerProvider>(context, listen: false);
+                                  provider.setStartPlaying(true);
+                                  provider.setState(0);
+                                  provider.setHours(_currentValue);
+                                  provider.setMinutes(_currentValue1);
+                                  provider.setSeconds(_currentValue2);
+                                  Navigator.pop(context);
+                                },
                                 child: Container(
                                   height: 50,
                                   decoration: BoxDecoration(

@@ -9,6 +9,7 @@ import 'package:taskmanager/screens/navigators/bottom_nav.dart';
 import 'package:taskmanager/screens/utils/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/payment_service.dart';
+import 'navigators/tabbed_bottom_nav.dart';
 
 
 
@@ -106,7 +107,7 @@ class _SubscribeState extends State<Subscribe> {
                   SizedBox(width: 10,),
                   InkWell(
                     onTap: ()async{
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => BottomNavBar()));
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => TabbedBottomNavBar()));
 
                       if(selectedProductId==""){
                         CoolAlert.show(

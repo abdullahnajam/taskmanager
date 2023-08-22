@@ -4,31 +4,34 @@ import 'package:taskmanager/screens/homepage.dart';
 import 'package:taskmanager/screens/time_block_screen.dart';
 import 'package:taskmanager/screens/timer_screen.dart';
 
+import '../../api/firebase_api.dart';
 import '../../test.dart';
+import '../utils/constants.dart';
 
-class BottomNavBar extends StatefulWidget {
+class TabbedBottomNavBar extends StatefulWidget {
 
   @override
   _BottomNavigationState createState() => new _BottomNavigationState();
 }
 
-class _BottomNavigationState extends State<BottomNavBar>{
+class _BottomNavigationState extends State<TabbedBottomNavBar> with SingleTickerProviderStateMixin {
 
   int _currentIndex = 0;
 
   List<Widget> _children=[];
-
+  TabController? _tabController;
   @override
   void initState() {
     super.initState();
+
     _children = [
       const Homepage(),
       const TimeBlockScreen(),
       const TimerScreen(),
       const CalendarScreen(),
-
-
     ];
+    _tabController = new TabController(vsync: this, length: _children.length);
+    _tabController!.addListener(_handleTabChange);
   }
 
   void onTabTapped(int index) {
@@ -44,53 +47,39 @@ class _BottomNavigationState extends State<BottomNavBar>{
   }
 
 
+  @override
+  void dispose() {
+    _tabController!.dispose();
+    super.dispose();
+  }
 
+  void _handleTabChange() {
+    setState(() {
+      // Do something with _tabController.index (current tab index)
+      _currentIndex = _tabController!.index;
+      print('Current Tab Index: $_currentIndex');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
 
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-     /* bottomNavigationBar: BottomNavigationBar(
+    return DefaultTabController(
 
-        items: const <BottomNavigationBarItem>[
+      length: 4,
+      child: Scaffold(
+        backgroundColor: Colors.white,
 
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+        bottomNavigationBar: TabBar(
+          controller: _tabController,
+          indicator: UnderlineTabIndicator(
+
+              borderSide: BorderSide(width: 4,color: Colors.orange),
+              insets: EdgeInsets.symmetric(horizontal:16.0)
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
-          ),
-          BottomNavigationBarItem(
-
-            icon: Icon(Icons.school),
-            label: 'School',
-          ),
-          BottomNavigationBarItem(
-
-            icon: Icon(Icons.school),
-            label: 'School',
-          ),
-        ],
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-
-      ),*/
-      /*bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(bottom: 5),
-        height: AppBar().preferredSize.height+20,
-        color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            InkWell(
-              onTap: (){
-                onTabTapped(0);
-              },
+          tabs: [
+            Tab(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -99,15 +88,12 @@ class _BottomNavigationState extends State<BottomNavBar>{
                     Image.asset("assets/images/home_fill.png",height: 25)
                   else
                     Image.asset("assets/images/home.png",height: 25),
-                  const Text('Home')
+                  const Text('Home',style: TextStyle(fontSize: 12),)
 
                 ],
               ),
             ),
-            InkWell(
-              onTap: (){
-                onTabTapped(1);
-              },
+            Tab(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -116,14 +102,11 @@ class _BottomNavigationState extends State<BottomNavBar>{
                     Image.asset("assets/images/block_fill.png",height: 25)
                   else
                     Image.asset("assets/images/block.png",height: 25),
-                  const Text('Time Block')
+                  const Text('Time Block',style: TextStyle(fontSize: 12),)
                 ],
               ),
             ),
-            InkWell(
-              onTap: (){
-                onTabTapped(2);
-              },
+            Tab(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -132,14 +115,11 @@ class _BottomNavigationState extends State<BottomNavBar>{
                     Image.asset("assets/images/timer_fill.png",height: 25)
                   else
                     Image.asset("assets/images/time.png",height: 25),
-                  const Text('Timer')
+                  const Text('Timer',style: TextStyle(fontSize: 12),)
                 ],
               ),
             ),
-            InkWell(
-              onTap: (){
-                onTabTapped(3);
-              },
+            Tab(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -148,23 +128,15 @@ class _BottomNavigationState extends State<BottomNavBar>{
                     Image.asset("assets/images/calendar_fill.png",height: 25)
                   else
                     Image.asset("assets/images/calendar.png",height: 25),
-                  const Text('Schedule')
+                  const Text('Schedule',style: TextStyle(fontSize: 12),)
                 ],
               ),
             ),
-
-
           ],
         ),
-      ),*/
-      bottomNavigationBar: TabBar(
-        tabs: [
-          Tab(icon: Icon(Icons.directions_car)),
-          Tab(icon: Icon(Icons.directions_transit)),
-          Tab(icon: Icon(Icons.directions_bike)),
-        ],
+
+        body:  _children[_currentIndex],
       ),
-      body: _children[_currentIndex],
     );
   }
 }

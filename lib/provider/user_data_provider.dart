@@ -20,4 +20,6 @@ class UserDataProvider extends ChangeNotifier {
     time = await SharedPrefHelper.getSeconds();
     notifyListeners();
   }
+
+
 }

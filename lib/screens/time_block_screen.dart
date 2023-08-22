@@ -24,6 +24,19 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
 
     int _currentValue = 0;
     int _currentValue1 = 0;
+    int max=59;
+    if((model.doneHour + (model.doneMin / 60))>=(model.maxHour + (model.maxMin / 60))){
+      max=0;
+    }
+    else{
+      if((model.doneHour + (model.doneMin / 60))<(model.maxHour + (model.maxMin / 60)) && model.maxHour-model.doneHour==0){
+        double decimalHours=((model.maxHour + (model.maxMin / 60))-(model.doneHour + (model.doneMin / 60)));
+        int hours = decimalHours.toInt();
+        double fractionalHours = decimalHours - hours;
+        max = (fractionalHours * 60).toInt();
+
+      }
+    }
     return showDialog<void>(
       context: context,
       barrierDismissible: true, // user must tap button!
@@ -60,7 +73,7 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Expanded(child: Text(model.todo,style: TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),),
+                                  Expanded(child: Text(model.todo,style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 20),),),
                                   InkWell(
                                     child: const CircleAvatar(
                                       radius: 12,
@@ -83,20 +96,22 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
                                     itemHeight: 25,
                                     itemWidth: 50,
                                     maxValue: model.maxHour-model.doneHour,
-                                    textStyle: TextStyle(fontSize: 12),
-                                    selectedTextStyle: TextStyle(fontSize: 15),
+                                    textStyle: const TextStyle(fontSize: 12),
+                                    selectedTextStyle: const TextStyle(fontSize: 15),
                                     onChanged: (value) => setState(() => _currentValue = value),
                                   ),
+                                  const Text('hours'),
                                   NumberPicker(
                                     value: _currentValue1,
                                     minValue: 0,
                                     itemHeight: 25,
                                     itemWidth: 50,
-                                    maxValue: 59,
-                                    textStyle: TextStyle(fontSize: 12),
-                                    selectedTextStyle: TextStyle(fontSize: 15),
+                                    maxValue: max,
+                                    textStyle: const TextStyle(fontSize: 12),
+                                    selectedTextStyle: const TextStyle(fontSize: 15),
                                     onChanged: (value) => setState(() => _currentValue1 = value),
                                   ),
+                                  const Text('minutes')
 
                                 ],
                               ),
@@ -110,10 +125,24 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
                                         pr.show(max: 100, msg: 'Updating');
 
                                         final provider = Provider.of<UserDataProvider>(context, listen: false);
+                                        /*double minutes=_currentValue1;
+                                        int remainingMinutes=0;
+                                        minutes=minutes+model.doneMin;
+                                        //int remainingMinutes=minutes.toInt();
+                                        if(minutes>1){
+                                          double decimalHours=minutes;
+                                          int hours = decimalHours.toInt();
+                                          double fractionalHours = decimalHours - hours;
+                                          remainingMinutes = (fractionalHours * 60).toInt();
+                                          _currentValue=_currentValue+hours;
+                                        }*/
+                                        double max=(model.maxHour + (model.maxMin / 60));
+                                        double updateDone=(model.doneHour + (model.doneMin / 60));
+                                        double done=((model.doneHour)+_currentValue + (_currentValue1 / 60));
 
                                         await FirebaseFirestore.instance.collection('timeblock').doc(model.id).update({
 
-                                          "doneHour":_currentValue,
+                                          "doneHour":(done>max && done>updateDone)?model.maxHour:(model.doneHour)+_currentValue,
                                           "doneMin":_currentValue1,
                                         }).then((value){
                                           pr.close();
@@ -192,51 +221,46 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
         child: const Icon(Icons.add,color: Colors.white,),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 20,),
-            StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('timeblock')
-                  .where("userId",isEqualTo: provider.userId).snapshots(),
-              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasError) {
-                  return const Center(child: Text('Something went wrong'));
-                }
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('timeblock')
+              .where("userId",isEqualTo: provider.userId).snapshots(),
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return const Center(child: Text('Something went wrong'));
+            }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
 
-                if (snapshot.data!.size==0) {
-                  return const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Center(
-                      child: Text(''),
-                    ),
-                  );
-                }
+            if (snapshot.data!.size==0) {
+              return const Padding(
+                padding: EdgeInsets.all(10),
+                child: Center(
+                  child: Text(''),
+                ),
+              );
+            }
 
-                return GridView(
-                  padding: EdgeInsets.all(10),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // Number of columns
-                    mainAxisSpacing: 10.0, // Spacing between rows
-                    crossAxisSpacing: 10.0, // Spacing between columns
-                    childAspectRatio: 1.12, // Width / Height ratio of grid items
-                  ),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-                    TimeBlockModel model=TimeBlockModel.fromMap(data,document.reference.id);
-                    return timeBlock(model);
-                  }).toList(),
-                );
-              },
-            ),
-          ],
+            return GridView(
+              padding: const EdgeInsets.all(10),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Number of columns
+                mainAxisSpacing: 10.0, // Spacing between rows
+                crossAxisSpacing: 10.0, // Spacing between columns
+                childAspectRatio: 1.12, // Width / Height ratio of grid items
+              ),
+              shrinkWrap: true,
+              //physics: const NeverScrollableScrollPhysics(),
+              children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                TimeBlockModel model=TimeBlockModel.fromMap(data,document.reference.id);
+                return timeBlock(model);
+              }).toList(),
+            );
+          },
         ),
       ),
     );
@@ -254,17 +278,34 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(model.todo,style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500),),
+              Text(model.todo,style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w500),),
+              if(model.doneHour==0)
               InkWell(
                 onTap: (){
-                  showEditDialog(context,model);
+                  CoolAlert.show(
+                    context: context,
+                    type: CoolAlertType.confirm,
+                    title: 'Complete Todo',
+                    text: 'Are you sure you want to mark it as complete?',
+                    cancelBtnText: 'No',
+                    confirmBtnText: 'Yes',
+                    onConfirmBtnTap: ()async{
+                      await FirebaseFirestore.instance.collection('timeblock').doc(model.id).update({
+
+                        "doneHour":model.maxHour,
+                        "doneMin":model.maxMin,
+                      });
+                      //Navigator.pop(context);
+                    }
+                  );
+
                 },
-                child: Icon(Icons.edit_outlined,size: 15,),
+                child: const Icon(Icons.edit_outlined,size: 15,),
               )
             ],
           ),
           Text('Invest ${model.doneHour} Hour/ ${model.maxHour} Hours'),
-          SizedBox(height: 20,),
+          const SizedBox(height: 20,),
           DashedCircularProgressBar.aspectRatio(
             aspectRatio: 2.5, // width ÷ height
             progress: (model.doneHour + (model.doneMin / 60)).toDouble(),
@@ -277,10 +318,10 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
             backgroundStrokeWidth: 10,
             animation: true,
             child: Center(
-              child: Text('${(model.doneHour + (model.doneMin / 60)).toStringAsFixed(1)}/${(model.maxHour + (model.maxMin / 60)).toStringAsFixed(1)}',style: TextStyle(fontSize: 10),),
+              child: Text('${(model.doneHour + (model.doneMin / 60)).toStringAsFixed(1)}/${(model.maxHour + (model.maxMin / 60)).toStringAsFixed(1)}',style: const TextStyle(fontSize: 10),),
             ),
           ),
-          SizedBox(height: 20,),
+          const SizedBox(height: 20,),
         ],
       ),
     );

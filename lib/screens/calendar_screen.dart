@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:taskmanager/api/time_api.dart';
 import 'package:taskmanager/models/reminder_model.dart';
 import 'package:taskmanager/screens/utils/constants.dart';
 import 'package:taskmanager/screens/utils/custom_dialog.dart';
@@ -46,6 +47,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
+          TimeApi.convertScheduleTime(32  , 00);
           showAddTodoDialog(context);
         },
         backgroundColor: Colors.black,
@@ -68,7 +70,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         viewCalendar=!viewCalendar;
                       });
                     },
-                    child: Icon(Icons.calendar_month_outlined,color: Colors.black,size: 30,)
+                    child: const Icon(Icons.calendar_month_outlined,color: Colors.black,size: 30,)
                   ),
                 )
               ],
@@ -79,7 +81,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   future: _getDataSource(provider.userId!),
                   builder: (context, AsyncSnapshot<List<Meeting>> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
+                      return const Center(
                         child: CircularProgressIndicator(),
                       );
                     }
@@ -99,8 +101,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           child: SfCalendar(
                             dataSource: MeetingDataSource(snapshot.data!),
                             view: CalendarView.month,
+                            initialSelectedDate: DateTime.now(),
                             initialDisplayDate: DateTime.now(),
-                            monthViewSettings: MonthViewSettings(
+                            monthViewSettings: const MonthViewSettings(
 
                               showAgenda: true,
                                 appointmentDisplayMode: MonthAppointmentDisplayMode.appointment),
@@ -159,17 +162,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Start Time'),
-              Text('Thing to do',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500),)
+              const Text('Start Time'),
+              Text(model.todo,style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w500),)
             ],
           ),
-          Text(dtf.format(DateTime.fromMillisecondsSinceEpoch(model.startTime)),style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w400),),
+          Text(model.formatedStartTime,style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w400),),
           const SizedBox(height: 10,),
           const Text('End Time'),
-          Text(dtf.format(DateTime.fromMillisecondsSinceEpoch(model.endTime)),style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w400),),
+          Text(model.formatedEndTime,style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w400),),
           const SizedBox(height: 10,),
           const Padding(
             padding: EdgeInsets.only(left: 10,right: 10),

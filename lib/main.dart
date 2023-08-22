@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:provider/provider.dart';
+import 'package:taskmanager/provider/timer_provider.dart';
 import 'package:taskmanager/provider/user_data_provider.dart';
 import 'package:taskmanager/screens/splash_screen.dart';
 
@@ -59,6 +60,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<UserDataProvider>(
           create: (_) => UserDataProvider(),
         ),
+        ChangeNotifierProvider<TimerProvider>(
+          create: (_) => TimerProvider(),
+        ),
 
 
       ],
@@ -67,7 +71,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.orange,
         ),
         debugShowCheckedModeBanner: false,
-        title: 'PelvicTron',
+        title: 'Task Manager',
 
         home: SplashScreen(),
       )

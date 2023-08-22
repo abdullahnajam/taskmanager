@@ -33,4 +33,29 @@ class NotificationService {
         schedule: NotificationCalendar.fromDate(date: interval));
   }
 
+  static Future<void> showAlarmNotification({required int id,required String title, required DateTime scheduleTime}) async {
+
+
+
+    await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          channelKey: 'basic_channel',
+          wakeUpScreen: true,
+          category: NotificationCategory.Alarm,
+          id: id,
+          displayOnBackground: true,
+          displayOnForeground: true,
+
+          title: title,
+          body: 'Tap to dismiss',
+          backgroundColor: primaryColor,
+          notificationLayout: NotificationLayout.BigText,
+        ),
+        schedule: NotificationCalendar.fromDate(date: scheduleTime, repeats: true,allowWhileIdle:true,preciseAlarm: true));
+
+
+
+  }
+
+
 }

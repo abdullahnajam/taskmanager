@@ -54,7 +54,7 @@ class FirebaseApi{
       querySnapshot.docs.forEach((doc) {
         Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
         ReminderModel model=ReminderModel.fromMap(data, doc.reference.id);
-        DateTime date=DateTime.fromMillisecondsSinceEpoch(model.endTime);
+        DateTime date=DateTime.fromMillisecondsSinceEpoch(model.startTime);
 
         if(date.isBefore(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day))){
           FirebaseFirestore.instance.collection('reminder').doc(model.id).update({
@@ -93,10 +93,19 @@ class FirebaseApi{
 
         }
         if(date.isBefore(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day))){
-          FirebaseFirestore.instance.collection('timeblock').doc(model.id).update({
-            "doneHour":updateHours,
-            "doneMin":updateMin,
+          FirebaseFirestore.instance
+              .collection('timeblock')
+              .doc(model.id)
+              .get()
+              .then((DocumentSnapshot documentSnapshot) {
+            if (documentSnapshot.exists) {
+              FirebaseFirestore.instance.collection('timeblock').doc(model.id).update({
+                "doneHour":updateHours,
+                "doneMin":updateMin,
+              });
+            }
           });
+
         }
       });
     });
@@ -104,25 +113,5 @@ class FirebaseApi{
 
   }
 
-  static Future<DateTime> convertToStandardTime(DateTime convertedDateTime) async{
-    int prefData=await SharedPrefHelper.getSeconds();
-    int seconds=prefData==16?40:80;
-    int totalSeconds =
-        convertedDateTime.hour * 60 * seconds + convertedDateTime.minute * seconds + convertedDateTime.second;
-    int newHours = (totalSeconds ~/ 3600);
-    int remainingSeconds = totalSeconds % 3600;
-    int newMinutes = (remainingSeconds ~/ seconds);
-    int newSeconds = remainingSeconds % seconds;
 
-    DateTime originalDateTime = DateTime(
-      convertedDateTime.year,
-      convertedDateTime.month,
-      convertedDateTime.day,
-      newHours,
-      newMinutes,
-      newSeconds,
-    );
-
-    return originalDateTime;
-  }
 }
