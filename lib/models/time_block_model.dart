@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class TimeBlockModel{
   String id,userId,todo;
   int maxHour,maxMin,maxSec,doneHour,doneMin,doneSec;
+  int createdAt;
 
   TimeBlockModel.fromMap(Map<String,dynamic> map,String key)
       : id=key,
@@ -13,6 +14,7 @@ class TimeBlockModel{
         doneMin = map['doneMin']??0,
         doneSec = map['doneSec']??0,
         todo = map['todo']??'',
+        createdAt = map['createdAt']??DateTime.now().millisecondsSinceEpoch,
         userId = map['userId']??'';
 
 

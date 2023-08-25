@@ -17,6 +17,7 @@ import 'package:taskmanager/screens/utils/constants.dart';
 
 import '../../api/notification_service.dart';
 import '../../api/time_api.dart';
+import '../../models/time_model.dart';
 import '../../provider/timer_provider.dart';
 import '../navigators/tabbed_bottom_nav.dart';
 
@@ -318,6 +319,7 @@ Future<void> showAddTimeBlockDialog(BuildContext context) async {
                                         "todo":_todoController.text,
                                         "maxHour":_currentValue,
                                         "maxMin":_currentValue1,
+                                        "createdAt":DateTime.now().millisecondsSinceEpoch,
                                         //"maxSec":_currentValue2,
                                         "doneHour":0,
                                         "doneMin":0,
@@ -383,7 +385,7 @@ Future<void> showAddTimeBlockDialog(BuildContext context) async {
   );
 }
 
-Future<void> showAddTodoDialog(BuildContext context) async {
+Future<void> showAddScheduleDialog(BuildContext context) async {
   final provider = Provider.of<UserDataProvider>(context, listen: false);
 
   DateTime selectedStartDate = DateTime.now();
@@ -393,12 +395,12 @@ Future<void> showAddTodoDialog(BuildContext context) async {
 
   int maxHours=await SharedPrefHelper.getSeconds();
 
-  DateTime alteredTime=await TimeApi.convertToAlteredTime(DateTime.now());
+  TimeModel alteredTime=await TimeApi.convertToAlteredTime2(DateTime.now());
 
-  int _currentValue = alteredTime.hour;
-  int _currentValue1 =  alteredTime.minute;
-  int _currentEndValue =  alteredTime.hour;
-  int _currentEndValue1 =  alteredTime.minute;
+  int _currentValue = alteredTime.hours;
+  int _currentValue1 =  alteredTime.minutes;
+  int _currentEndValue =  alteredTime.hours;
+  int _currentEndValue1 =  alteredTime.minutes;
 
   TimeBlockModel? selectedObject;
   List<TimeBlockModel> dropdownData = [];
@@ -580,85 +582,72 @@ Future<void> showAddTodoDialog(BuildContext context) async {
                                 child: InkWell(
                                   onTap: ()async{
                                     if(_formKey.currentState!.validate()){
-                                      if(selectedObject!=null){
-                                        int notificationId=0;
-                                        final ProgressDialog pr = ProgressDialog(context: context);
-                                        pr.show(max: 100, msg: 'Adding Reminder');
-                                        await FirebaseFirestore.instance.collection('reminder').get().then((QuerySnapshot querySnapshot) {
-                                          querySnapshot.docs.forEach((doc) {
-                                            notificationId++;
-                                          });
-                                        });
-                                        final provider = Provider.of<UserDataProvider>(context, listen: false);
-                                        var now=DateTime.now();
-                                        /*selectedStartDate=DateTime(now.year,now.month,now.day,)*/
-                                        selectedStartDate=await TimeApi.convertScheduleTime(_currentValue, _currentValue1);
-                                        selectedEndDate=await TimeApi.convertScheduleTime(_currentEndValue, _currentEndValue1);
-                                        print('start date $selectedStartDate : end date $selectedEndDate');
-                                        await FirebaseFirestore.instance.collection('reminder').add({
-                                          "userId":provider.userId,
-                                          "startTime":selectedStartDate.millisecondsSinceEpoch,
-                                          "endTime":selectedEndDate.millisecondsSinceEpoch,
-                                          "formatedStartTime":'$_currentValue:$_currentValue1',
-                                          "formatedEndTime":'$_currentEndValue:$_currentEndValue1',
-                                          "notificationId":notificationId,
-                                          "todo":selectedObject!.todo,
-                                          "todoId":selectedObject!.id,
-                                          "status":'in progress',
-                                        }).then((value)async{
-
-                                          NotificationService.showAlarmNotification(
-                                              title: 'Start ${selectedObject!.todo}',
-                                              id: notificationId,
-                                              scheduleTime: selectedStartDate
-                                          );
-                                          NotificationService.showAlarmNotification(
-                                              title: 'End ${selectedObject!.todo}',
-                                              id: int.parse('${notificationId}0101'),
-                                              scheduleTime: selectedEndDate
-                                          );
-
-                                          /*await Alarm.init();
-                                          final alarmSettings = AlarmSettings(
-                                            id: notificationId,
-                                            dateTime: selectedStartDate,
-                                            assetAudioPath: 'assets/audio/alarm.mp3',
-                                            loopAudio: true,
-                                            vibrate: true,
-                                            volumeMax: true,
-                                            notificationTitle: selectedObject!.todo,
-                                            enableNotificationOnKill: true,
-                                          );
-                                          final alarmSettings2 = AlarmSettings(
-                                            id: notificationId,
-                                            dateTime: selectedEndDate,
-                                            assetAudioPath: 'assets/audio/alarm.mp3',
-                                            loopAudio: true,
-                                            vibrate: true,
-                                            volumeMax: true,
-                                            notificationTitle: selectedObject!.todo,
-                                            enableNotificationOnKill: true,
-                                          );
-                                          await Alarm.set(alarmSettings: alarmSettings);
-                                          await Alarm.set(alarmSettings: alarmSettings2);*/
-                                          //NotificationService().showScheduledNotification(notificationId, "Reminder",  selectedEndDate);
-                                          pr.close();
-                                          Navigator.pop(context);
-                                        }).onError((error, stackTrace){
-                                          pr.close();
-                                          CoolAlert.show(
-                                            context: context,
-                                            type: CoolAlertType.error,
-                                            text: error.toString(),
-                                          );
-                                        });
-                                      }
-                                      else{
+                                      if (_currentEndValue==alteredTime.hours && _currentEndValue1==alteredTime.minutes) {
                                         CoolAlert.show(
                                           context: context,
                                           type: CoolAlertType.error,
-                                          text: "Please select a todo",
+                                          backgroundColor: primaryColor,
+                                          confirmBtnColor: primaryColor,
+                                          text: "Please select end time",
                                         );
+                                      }
+                                      else{
+                                        if(selectedObject!=null){
+                                          int notificationId=0;
+                                          final ProgressDialog pr = ProgressDialog(context: context);
+                                          pr.show(max: 100, msg: 'Adding Reminder');
+                                          await FirebaseFirestore.instance.collection('reminder').get().then((QuerySnapshot querySnapshot) {
+                                            querySnapshot.docs.forEach((doc) {
+                                              notificationId++;
+                                            });
+                                          });
+                                          final provider = Provider.of<UserDataProvider>(context, listen: false);
+                                          var now=DateTime.now();
+                                          selectedStartDate=await TimeApi.convertBackToOriginalTime(_currentValue, _currentValue1);
+                                          selectedEndDate=await TimeApi.convertBackToOriginalTime(_currentEndValue, _currentEndValue1);
+                                          print('start date $selectedStartDate : end date $selectedEndDate');
+                                          await FirebaseFirestore.instance.collection('reminder').add({
+                                            "userId":provider.userId,
+                                            "startTime":selectedStartDate.millisecondsSinceEpoch,
+                                            "endTime":selectedEndDate.millisecondsSinceEpoch,
+                                            "formatedStartTime":'$_currentValue:$_currentValue1',
+                                            "formatedEndTime":'$_currentEndValue:$_currentEndValue1',
+                                            "notificationId":notificationId,
+                                            "todo":selectedObject!.todo,
+                                            "todoId":selectedObject!.id,
+                                            "status":'in progress',
+                                          }).then((value)async{
+
+                                            NotificationService.showAlarmNotification(
+                                                title: 'Start ${selectedObject!.todo}',
+                                                id: notificationId,
+                                                scheduleTime: selectedStartDate
+                                            );
+                                            NotificationService.showAlarmNotification(
+                                                title: 'End ${selectedObject!.todo}',
+                                                id: int.parse('${notificationId}0101'),
+                                                scheduleTime: selectedEndDate
+                                            );
+                                            pr.close();
+                                            Navigator.pop(context);
+                                          }).onError((error, stackTrace){
+                                            pr.close();
+                                            CoolAlert.show(
+                                              context: context,
+                                              type: CoolAlertType.error,
+                                              text: error.toString(),
+                                            );
+                                          });
+                                        }
+                                        else{
+                                          CoolAlert.show(
+                                            context: context,
+                                            type: CoolAlertType.error,
+                                            backgroundColor: primaryColor,
+                                            confirmBtnColor: primaryColor,
+                                            text: "Please select a todo",
+                                          );
+                                        }
                                       }
                                     }
 
@@ -713,7 +702,7 @@ Future<void> showAddTodoDialog(BuildContext context) async {
 }
 
 Future<void> showStartTimerDialog(BuildContext context) async {
-
+  final time = Provider.of<TimerProvider>(context, listen: false);
   int _currentValue1 = 0;
   int _currentValue2 = 0;
   int _currentValue=1;
@@ -727,6 +716,7 @@ Future<void> showStartTimerDialog(BuildContext context) async {
     dropdownData = data;
     if(data.isNotEmpty)
       selectedObject=data.first;
+      time.setTodo(data.first);
   });
 
   return showDialog<void>(
@@ -747,7 +737,7 @@ Future<void> showStartTimerDialog(BuildContext context) async {
             elevation: 2,
 
             child: Container(
-              height: MediaQuery.of(context).size.height*0.5,
+              height: MediaQuery.of(context).size.height*0.45,
               width: MediaQuery.of(context).size.width*0.9,
               decoration: BoxDecoration(
                   color: greyColor,
@@ -792,6 +782,8 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                               onChanged: (newValue) {
                                 setState(() {
                                   selectedObject = newValue;
+
+                                  time.setTodo(selectedObject!);
                                 });
                               },
                               items: dropdownData.map((obj) {
@@ -824,35 +816,41 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 NumberPicker(
+                                  zeroPad: true,
                                   value: _currentValue,
                                   minValue: 0,
                                   itemHeight: 25,
-                                  itemWidth: 50,
+                                  itemWidth: 40,
                                   maxValue: maxHours,
                                   textStyle: TextStyle(fontSize: 12),
                                   selectedTextStyle: TextStyle(fontSize: 15),
                                   onChanged: (value) => setState(() => _currentValue = value),
                                 ),
+                                Text('hours'),
                                 NumberPicker(
+                                  zeroPad: true,
                                   value: _currentValue1,
                                   minValue: 0,
                                   itemHeight: 25,
-                                  itemWidth: 50,
+                                  itemWidth: 40,
                                   maxValue: 80,
                                   textStyle: TextStyle(fontSize: 12),
                                   selectedTextStyle: TextStyle(fontSize: 15),
                                   onChanged: (value) => setState(() => _currentValue1 = value),
                                 ),
+                                Text('minutes'),
                                 NumberPicker(
+                                  zeroPad: true,
                                   value: _currentValue2,
                                   minValue: 0,
                                   itemHeight: 25,
-                                  itemWidth: 50,
+                                  itemWidth: 40,
                                   maxValue: maxSeconds,
                                   textStyle: TextStyle(fontSize: 12),
                                   selectedTextStyle: TextStyle(fontSize: 15),
                                   onChanged: (value) => setState(() => _currentValue2 = value),
                                 ),
+                                Text('seconds'),
                               ],
                             )
                           ],
@@ -872,9 +870,16 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                                   final provider = Provider.of<TimerProvider>(context, listen: false);
                                   provider.setStartPlaying(true);
                                   provider.setState(0);
+
                                   provider.setHours(_currentValue);
+                                  provider.setSelectedHours(_currentValue);
+
                                   provider.setMinutes(_currentValue1);
+                                  provider.setSelectedMinutes(_currentValue1);
+
                                   provider.setSeconds(_currentValue2);
+                                  provider.setSelectedSeconds(_currentValue2);
+
                                   Navigator.pop(context);
                                 },
                                 child: Container(

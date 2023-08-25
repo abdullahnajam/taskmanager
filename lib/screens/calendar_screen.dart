@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:taskmanager/api/time_api.dart';
 import 'package:taskmanager/models/reminder_model.dart';
+import 'package:taskmanager/models/time_block_model.dart';
 import 'package:taskmanager/screens/utils/constants.dart';
 import 'package:taskmanager/screens/utils/custom_dialog.dart';
 
@@ -20,7 +21,7 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> {
   bool viewCalendar=false;
-  Future<List<Meeting>> _getDataSource(String userId) async{
+  /*Future<List<Meeting>> _getDataSource(String userId) async{
     final List<Meeting> meetings = <Meeting>[];
     DateTime today=DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
@@ -39,6 +40,31 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
 
     return meetings;
+  }*/
+
+  Future<List<Meeting>> _getDataSource(String userId) async{
+    final List<Meeting> meetings = <Meeting>[];
+    DateTime today=DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+    await FirebaseFirestore.instance.collection('timeblock').where('userId',isEqualTo: userId).get().then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
+        TimeBlockModel model=TimeBlockModel.fromMap(data, doc.reference.id);
+        final DateTime startTime = DateTime.fromMillisecondsSinceEpoch(model.createdAt);
+
+        if(startTime.isBefore(today)){
+          meetings.add(Meeting(model.todo, startTime, startTime, (model.doneHour==model.maxHour && model.maxMin==model.maxMin)?Colors.green:Colors.red, true));
+
+        }
+        else{
+          meetings.add(Meeting(model.todo, startTime, startTime, (model.doneHour==model.maxHour && model.maxMin==model.maxMin)?Colors.green:Colors.orange, true));
+        }
+      });
+    });
+
+
+
+    return meetings;
   }
   @override
   Widget build(BuildContext context) {
@@ -47,8 +73,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          TimeApi.convertScheduleTime(32  , 00);
-          showAddTodoDialog(context);
+          TimeApi.convertBackToOriginalTime(23  , 5);
+          showAddScheduleDialog(context);
         },
         backgroundColor: Colors.black,
         shape: RoundedRectangleBorder(

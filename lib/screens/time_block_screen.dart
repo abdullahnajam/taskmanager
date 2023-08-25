@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
+import 'package:taskmanager/api/time_api.dart';
 import 'package:taskmanager/models/time_block_model.dart';
 import 'package:taskmanager/screens/utils/constants.dart';
 import 'package:taskmanager/screens/utils/custom_dialog.dart';
@@ -212,6 +213,8 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
+          //TimeApi.convertBackToOriginalTime2(25,24);
+          print(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day).millisecondsSinceEpoch);
           showAddTimeBlockDialog(context);
         },
         backgroundColor: Colors.black,
@@ -223,7 +226,8 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('timeblock')
-              .where("userId",isEqualTo: provider.userId).snapshots(),
+              .where("userId",isEqualTo: provider.userId)
+              .where("createdAt",isGreaterThanOrEqualTo: DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day).millisecondsSinceEpoch).snapshots(),
           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
               return const Center(child: Text('Something went wrong'));
@@ -285,10 +289,12 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
                   CoolAlert.show(
                     context: context,
                     type: CoolAlertType.confirm,
+                    backgroundColor: primaryColor,
                     title: 'Complete Todo',
                     text: 'Are you sure you want to mark it as complete?',
                     cancelBtnText: 'No',
                     confirmBtnText: 'Yes',
+                    confirmBtnColor: primaryColor,
                     onConfirmBtnTap: ()async{
                       await FirebaseFirestore.instance.collection('timeblock').doc(model.id).update({
 
@@ -302,6 +308,8 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
                 },
                 child: const Icon(Icons.edit_outlined,size: 15,),
               )
+              else
+                Icon(Icons.check_circle,color: Colors.green,size: 15,)
             ],
           ),
           Text('Invest ${model.doneHour} Hour/ ${model.maxHour} Hours'),

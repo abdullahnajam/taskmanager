@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'package:taskmanager/api/shared_pref_api.dart';
 import 'package:taskmanager/models/reminder_model.dart';
 import 'package:taskmanager/models/time_block_model.dart';
+import 'package:taskmanager/provider/timer_provider.dart';
 
 class FirebaseApi{
 
@@ -110,6 +113,29 @@ class FirebaseApi{
       });
     });
 
+
+  }
+
+  static Future<void> updateTimeBlock(BuildContext context) async {
+    final provider = Provider.of<TimerProvider>(context, listen: false);
+    double maxTime=provider.model!.maxHour+(provider.model!.maxMin/60);
+    double doneTime=provider.model!.doneHour+(provider.model!.doneMin/60);
+    double doneTimeByTime=provider.selectedHours+(provider.selectedMinutes/60);
+    print('${provider.model!.id} : done $doneTime : $doneTimeByTime');
+    if((doneTime+doneTimeByTime)<=maxTime){
+      print('update if');
+      await FirebaseFirestore.instance.collection('timeblock').doc(provider.model!.id).update({
+        "doneHour":provider.selectedHours+provider.model!.doneHour,
+        "doneMin":provider.selectedMinutes+provider.model!.doneMin,
+      });
+    }
+    else{
+      print('update else');
+      await FirebaseFirestore.instance.collection('timeblock').doc(provider.model!.id).update({
+        "doneHour":provider.model!.maxHour,
+        "doneMin":provider.model!.maxMin,
+      });
+    }
 
   }
 

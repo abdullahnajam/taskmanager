@@ -45,7 +45,6 @@ class NotificationService {
           id: id,
           displayOnBackground: true,
           displayOnForeground: true,
-
           title: title,
           body: 'Tap to dismiss',
           backgroundColor: primaryColor,

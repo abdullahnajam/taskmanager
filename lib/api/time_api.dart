@@ -1,4 +1,5 @@
 import 'package:taskmanager/api/shared_pref_api.dart';
+import 'package:taskmanager/models/time_model.dart';
 
 class TimeApi{
   static Future<DateTime> convertToStandardTime(DateTime convertedDateTime) async{
@@ -89,7 +90,32 @@ class TimeApi{
     return convertedDateTime;
   }
 
-  static Future<DateTime> convertBackToOriginalTime(DateTime convertedDateTime) async{
+  static Future<TimeModel> convertToAlteredTime2(DateTime convertedDateTime) async{
+
+
+    int timeHours=await SharedPrefHelper.getSeconds();
+    double newMinutesInHour=(24/timeHours) * 60;
+
+    int totalSeconds =
+        ( DateTime.now().hour * (3600)) +
+            (DateTime.now().minute * 60) +
+            DateTime.now().second;
+    print('1 $totalSeconds');
+
+    //totalSeconds=totalSeconds+differentInSeconds;
+
+    double decimalValue = totalSeconds/(newMinutesInHour*60);
+    int hours = decimalValue.floor();
+    double remainingMinutesDecimal = (decimalValue - hours) * 60;
+    int minutes = remainingMinutesDecimal.floor();
+    int seconds = ((remainingMinutesDecimal - minutes) * 60).floor();
+
+    TimeModel model=TimeModel(hours: hours, minutes: minutes, seconds: seconds);
+    print('$hours : $minutes : $seconds');
+    return model;
+  }
+
+  /*static Future<DateTime> convertBackToOriginalTime(DateTime convertedDateTime) async{
     int hours=await SharedPrefHelper.getSeconds();
     int newSecondsInMinute=((hours/24)*60).toInt();
 
@@ -118,6 +144,41 @@ class TimeApi{
       newSeconds.truncate(),
     );
     print('converted Time = $convertedDateTime | original Time = $originalTime');
+    return originalTime;
+  }*/
+
+
+  static Future<DateTime> convertBackToOriginalTime(int hour,int minute) async{
+    int newHours=await SharedPrefHelper.getSeconds();
+
+
+
+    //( 24 / selected time ) *60 = total minutes in 1 hour of new time
+    double newMinutesInHour=(((hour+(minute/60))*24)/newHours);
+
+
+    /*double totalSeconds =
+        ( hour * (60*60)) +
+            (minute * 60) +
+            0;
+    print('1 $totalSeconds');*/
+
+
+    double decimalValue = newMinutesInHour;
+    print(decimalValue);
+    int hours = decimalValue.floor();
+    double remainingMinutesDecimal = (decimalValue - hours) * 60;
+    int minutes = remainingMinutesDecimal.floor();
+    int seconds = ((remainingMinutesDecimal - minutes) * 60).floor();
+    DateTime originalTime = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+      hours,
+      minutes,
+      seconds,
+    );
+    print('original Time = $originalTime');
     return originalTime;
   }
 

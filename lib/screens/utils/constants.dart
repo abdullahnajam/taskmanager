@@ -12,7 +12,7 @@ const loremIpsum='Lorem Ipsum is simply dummy text of the printing and typesetti
 
 List<String> productLists =  ['299pelvictronmonthly','2999pelvictronyearly','599pelvictronmonthly'];
 
-final dtf = new DateFormat('hh:mm:ss');
-final f = new DateFormat('hh : mm');
+
+final f = new DateFormat('HH : mm');
 final clockFormat = new DateFormat('HH : mm : ss');
 

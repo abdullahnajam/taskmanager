@@ -42,32 +42,36 @@ class _HomepageState extends State<Homepage> {
     WidgetsBinding.instance.addPostFrameCallback((_){
       getHours().then((value)async{
         int differentInSeconds=await SharedPrefHelper.getSecondDiff();
+        int hours=await SharedPrefHelper.getSeconds();
+
+        //( 24 / selected time ) *60 = total minutes in 1 hour of new time
+        double newMinutesInHour=(24/hours) * 60;
+
+
+
+
         print(differentInSeconds);
         Timer.periodic(const Duration(seconds: 1), (Timer t) {
           if(mounted){
             setState(() {
 
               int totalSeconds =
-                  ( DateTime.now().hour * 3600) +
+                  ( DateTime.now().hour * (3600)) +
                       (DateTime.now().minute * 60) +
                       DateTime.now().second;
               print('1 $totalSeconds');
 
-              totalSeconds=totalSeconds+differentInSeconds;
+              //totalSeconds=totalSeconds+differentInSeconds;
+
+              double decimalValue = totalSeconds/(newMinutesInHour*60);
+              int hours = decimalValue.floor();
+              double remainingMinutesDecimal = (decimalValue - hours) * 60;
+              int minutes = remainingMinutesDecimal.floor();
+              int seconds = ((remainingMinutesDecimal - minutes) * 60).floor();
 
 
-              int newMinutes = (totalSeconds / 60).floor();
-              double newSeconds = (totalSeconds % 60);
-              DateTime convertedDateTime = DateTime(
-                DateTime.now().year,
-                DateTime.now().month,
-                DateTime.now().day,
-                newMinutes ~/ 60,
-                newMinutes % 60,
-                newSeconds.truncate(),
-              );
-              TimeApi.convertBackToOriginalTime(convertedDateTime);
-              clock= clockFormat.format(convertedDateTime);
+              TimeApi.convertBackToOriginalTime(hours, minutes);
+              clock= '$hours : $minutes : $seconds';
             });
           }
         });
