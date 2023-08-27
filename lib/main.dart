@@ -35,17 +35,32 @@ void main()async{
             defaultColor: Colors.black,
             enableVibration: true,
             playSound: true,
-            ledColor: Colors.white)
+            defaultRingtoneType: DefaultRingtoneType.Notification,
+            ledColor: Colors.white),
+        NotificationChannel(
+            channelGroupKey: 'alarm_channel_group',
+            channelKey: 'alarm_channel',
+            channelName: 'Alarm notifications',
+            channelDescription: 'Notification channel for alarm tests',
+            defaultColor: Colors.black,
+            enableVibration: true,
+            playSound: true,
+            soundSource: 'resource://raw/alarm', // Replace with the custom alarm sound file
+            ledColor: Colors.white),
       ],
       // Channel groups are only visual and are not required
       channelGroups: [
         NotificationChannelGroup(
             channelGroupKey: 'basic_channel_group',
-            channelGroupName: 'Basic group')
+            channelGroupName: 'Basic group'),
+        NotificationChannelGroup(
+            channelGroupKey: 'alarm_channel_group',
+            channelGroupName: 'Alarm group')
       ],
       debug: true
   );
   runApp(const MyApp());
+  requestNotificationPermissions();
 }
 
 class MyApp extends StatelessWidget {
@@ -76,6 +91,29 @@ class MyApp extends StatelessWidget {
         home: SplashScreen(),
       )
     );
+  }
+}
+
+Future<void> requestNotificationPermissions() async {
+  // Request permissions
+  bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+
+  if (!isAllowed) {
+    // On Android, request permission
+    if (await AwesomeNotifications().requestPermissionToSendNotifications()) {
+      print('Notification permissions granted');
+    } else {
+      print('Notification permissions denied');
+    }
+
+    // On iOS, request permission
+    if (await AwesomeNotifications().requestPermissionToSendNotifications()) {
+      print('Notification permissions granted');
+    } else {
+      print('Notification permissions denied');
+    }
+  } else {
+    print('Notification permissions already granted');
   }
 }
 

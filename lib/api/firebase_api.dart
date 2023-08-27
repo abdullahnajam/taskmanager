@@ -11,7 +11,9 @@ class FirebaseApi{
   static Future<List<TimeBlockModel>> getTimeBlocks(String userId) async {
     List<TimeBlockModel> dataList = [];
 
-    await FirebaseFirestore.instance.collection('timeblock').where('userId',isEqualTo: userId).get().then((QuerySnapshot querySnapshot) {
+    await FirebaseFirestore.instance.collection('timeblock').where('userId',isEqualTo: userId)
+        .where("createdAt",isGreaterThanOrEqualTo: DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day).millisecondsSinceEpoch)
+        .get().then((QuerySnapshot querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
         TimeBlockModel model=TimeBlockModel.fromMap(data, doc.reference.id);

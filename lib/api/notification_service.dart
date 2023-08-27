@@ -39,7 +39,7 @@ class NotificationService {
 
     await AwesomeNotifications().createNotification(
         content: NotificationContent(
-          channelKey: 'basic_channel',
+          channelKey: 'alarm_channel',
           wakeUpScreen: true,
           category: NotificationCategory.Alarm,
           id: id,

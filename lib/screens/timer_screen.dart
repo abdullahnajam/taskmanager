@@ -276,6 +276,15 @@ class _TimerScreenState extends State<TimerScreen> {
     final user = Provider.of<UserDataProvider>(context, listen: false);
 
     TimeBlockModel? selectedTodo;
+    List<TimeBlockModel> timeBlocks=[];
+
+    await FirebaseApi.getTimeBlocks(user.userId!).then((data) {
+      timeBlocks = data;
+      if(data.isNotEmpty)
+        selectedTodo=data.first;
+
+    });
+
 
     return showDialog<void>(
       context: context,
@@ -324,54 +333,23 @@ class _TimerScreenState extends State<TimerScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10,),
-                              StreamBuilder<QuerySnapshot>(
-                                stream: FirebaseFirestore.instance.collection('timeblock')
-                                    .where("userId",isEqualTo: user.userId)
-                                    .where("createdAt",isGreaterThanOrEqualTo: DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day).millisecondsSinceEpoch).snapshots(),
-                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasError) {
-                                    return const Center(child: Text('Something went wrong'));
-                                  }
-
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  }
-
-                                  if (snapshot.data!.size==0) {
-                                    return const Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Center(
-                                        child: Text(''),
-                                      ),
-                                    );
-                                  }
-
-                                  return ListView(
-                                    padding: const EdgeInsets.all(10),
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                                      Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-                                      TimeBlockModel model=TimeBlockModel.fromMap(data,document.reference.id);
-                                      return ListTile(
-                                        onTap: (){
-                                          setState(() {
-                                            selectedTodo=model;
-                                          });
-                                        },
-                                        title: Text(model.todo),
-                                        trailing: selectedTodo!=null?
-                                      selectedTodo!.id==model.id?const Icon(Icons.check_circle,color: primaryColor,):const SizedBox(height: 1,width: 1,):const SizedBox(height: 1,width: 1,),
-                                      );
-                                    }).toList(),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: timeBlocks.length,
+                                itemBuilder: (BuildContext context,int index){
+                                  return ListTile(
+                                    onTap: (){
+                                      setState(() {
+                                        selectedTodo=timeBlocks[index];
+                                      });
+                                    },
+                                    title: Text(timeBlocks[index].todo),
+                                    trailing: selectedTodo!=null?
+                                    selectedTodo!.id==timeBlocks[index].id?const Icon(Icons.check_circle,color: primaryColor,):const SizedBox(height: 1,width: 1,):const SizedBox(height: 1,width: 1,),
                                   );
                                 },
                               ),
-
-
                               const SizedBox(height: 10,),
                               Row(
                                 children: [
@@ -380,9 +358,9 @@ class _TimerScreenState extends State<TimerScreen> {
                                       onTap: (){
                                         if(selectedTodo!=null){
                                           provider.setTodo(selectedTodo!);
+                                          provider.setState(1);
                                           setState(() {
-                                            provider.setState(1);
-                                            sqliteHelper.insert(context,provider.model!);
+
                                             startCountdown(provider.remainingHours, provider.remainingMinutes, provider.remainingSeconds);
 
                                           });
@@ -390,12 +368,12 @@ class _TimerScreenState extends State<TimerScreen> {
                                         }
                                         else{
                                           CoolAlert.show(
-                                              context: context,
-                                              type: CoolAlertType.error,
-                                              backgroundColor: primaryColor,
-                                              title: 'Todo Not Selected',
-                                              text: 'Please select a todo from list to continue',
-                                              confirmBtnColor: primaryColor,
+                                            context: context,
+                                            type: CoolAlertType.error,
+                                            backgroundColor: primaryColor,
+                                            title: 'Todo Not Selected',
+                                            text: 'Please select a todo from list to continue',
+                                            confirmBtnColor: primaryColor,
 
                                           );
                                         }
