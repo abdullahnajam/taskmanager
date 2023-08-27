@@ -12,6 +12,16 @@ class SharedPrefHelper{
     return prefs.getInt('SECONDS')??32;
   }
 
+  static Future setStartCountDown(bool value)async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('TIMER', value);
+  }
+
+  static Future<bool> getStartCountdown()async{
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('TIMER')??false;
+  }
+
   static Future<int> getSecondsInMinute()async{
     final prefs = await SharedPreferences.getInstance();
     int hours= prefs.getInt('SECONDS')??32;

@@ -4,6 +4,7 @@ import 'package:taskmanager/screens/homepage.dart';
 import 'package:taskmanager/screens/time_block_screen.dart';
 import 'package:taskmanager/screens/timer_screen.dart';
 
+import '../../api/background_handler.dart';
 import '../../api/firebase_api.dart';
 import '../../test.dart';
 import '../utils/constants.dart';
@@ -29,9 +30,11 @@ class _BottomNavigationState extends State<TabbedBottomNavBar> with SingleTicker
       const TimeBlockScreen(),
       const TimerScreen(),
       const CalendarScreen(),
+
     ];
     _tabController = new TabController(vsync: this, length: _children.length);
     _tabController!.addListener(_handleTabChange);
+
   }
 
   void onTabTapped(int index) {

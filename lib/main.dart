@@ -1,8 +1,10 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:provider/provider.dart';
+import 'package:taskmanager/api/sqlite_helper.dart';
 import 'package:taskmanager/provider/timer_provider.dart';
 import 'package:taskmanager/provider/user_data_provider.dart';
 import 'package:taskmanager/screens/splash_screen.dart';
@@ -59,6 +61,10 @@ void main()async{
       ],
       debug: true
   );
+  await Hive.initFlutter();
+
+  SqliteHelper sqliteHelper=SqliteHelper();
+  sqliteHelper.initDatabase();
   runApp(const MyApp());
   requestNotificationPermissions();
 }

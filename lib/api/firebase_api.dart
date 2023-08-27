@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:taskmanager/api/shared_pref_api.dart';
 import 'package:taskmanager/models/reminder_model.dart';
+import 'package:taskmanager/models/sql_data_model.dart';
 import 'package:taskmanager/models/time_block_model.dart';
 import 'package:taskmanager/provider/timer_provider.dart';
 
@@ -136,6 +137,27 @@ class FirebaseApi{
       await FirebaseFirestore.instance.collection('timeblock').doc(provider.model!.id).update({
         "doneHour":provider.model!.maxHour,
         "doneMin":provider.model!.maxMin,
+      });
+    }
+
+  }
+
+  static Future<void> updateTimeBlockInBackground(SqlDataModel model) async {
+    double maxTime=model.maxHour+(model.maxMin/60);
+    double doneTime=model.doneHour+(model.doneMin/60);
+    double doneTimeByTime=model.timerHour+(model.timerMin/60);
+    if((doneTime+doneTimeByTime)<=maxTime){
+      print('update if');
+      await FirebaseFirestore.instance.collection('timeblock').doc(model.userId).update({
+        "doneHour":model.timerHour+model.doneHour,
+        "doneMin":model.timerMin+model.doneMin,
+      });
+    }
+    else{
+      print('update else');
+      await FirebaseFirestore.instance.collection('timeblock').doc(model.userId).update({
+        "doneHour":model.maxHour,
+        "doneMin":model.maxMin,
       });
     }
 

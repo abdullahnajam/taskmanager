@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:hive/hive.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart' as kakao;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,8 @@ import 'package:taskmanager/screens/login_screen.dart';
 import 'package:taskmanager/screens/navigators/bottom_nav.dart';
 import 'package:taskmanager/screens/navigators/tabbed_bottom_nav.dart';
 
+import '../api/background_handler.dart';
+import '../api/shared_pref_api.dart';
 import '../provider/user_data_provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -28,7 +31,11 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void navigationPage() async{
+    var box = await Hive.openBox('timer');
+   /* var box = await Hive.openBox('timer');
+    box.put('todo', 'David');*/
     await FirebaseApi.setScheduleStatus();
+    await SharedPrefHelper.setStartCountDown(false);
     //await FirebaseApi.updateTodos();
     //print(UserApi.instance.toString());
     if(FirebaseAuth.instance.currentUser!=null){

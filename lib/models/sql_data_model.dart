@@ -26,5 +26,26 @@ class SqlDataModel{
         todo = map['todo']??'',
         userId = map['userId']??'';
 
+  Map<String, dynamic> toMap() {
+    return {
+      'id': 0,
+      'maxHour': maxHour,
+      'state': state,
+      'maxMin': maxMin,
+      'timerHour': timerHour,
+      'doneHour': doneHour,
+      'doneMin': doneMin,
+      'timerMin': timerMin,
+      'timerSec': timerSec,
+      'timerRemainingHour': timerRemainingHour,
+      'timerRemainingMin': timerRemainingMin,
+      'customHour': customHour,
+      'customSecondsInMinute': customSecondsInMinute,
+      'todoId': todoId,
+      'todo': todo,
+      'userId': userId,
+    };
+  }
+
 
 }
