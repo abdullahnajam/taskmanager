@@ -34,6 +34,7 @@ class _BottomNavigationState extends State<TabbedBottomNavBar> with SingleTicker
     ];
     _tabController = new TabController(vsync: this, length: _children.length);
     _tabController!.addListener(_handleTabChange);
+    initializeService();
 
   }
 

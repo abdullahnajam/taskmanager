@@ -4,24 +4,96 @@
     android:layout_width="match_parent"
     android:layout_height="200dp">
 
-    <RelativeLayout
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFFFF">
+        android:background="#FFFFFF"
+        android:orientation="horizontal">
 
+        <!-- Timer Text - Centered on the left -->
         <TextView
             android:id="@+id/timerTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="00:00"
+            android:textSize="20sp" />
+
+        <!-- Button Container - Aligned to the right -->
+        <LinearLayout
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="00:00:00"
-            android:textSize="24sp"
-            android:textColor="#000000"
-            android:fontFamily="sans-serif-medium"/>
+            android:orientation="vertical">
 
-    </RelativeLayout>
+            <!-- Top Row of Buttons -->
+            <LinearLayout
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
+                <Button
+                    android:id="@+id/hourOne"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1 hour"
+                    android:background="@drawable/circular_button_background"
+                    android:textColor="#000000"
+                    android:layout_marginRight="8dp" />
 
+                <Button
+                    android:id="@+id/hourTwo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2 hour"
+                    android:background="@drawable/circular_button_background"
+                    android:textColor="#000000" />
+            </LinearLayout>
 
+            <!-- Bottom Row of Buttons -->
+            <LinearLayout
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/hourThree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3 hour"
+                    android:background="@drawable/circular_button_background"
+                    android:textColor="#000000"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginRight="8dp" />
+
+                <Button
+                    android:id="@+id/hourFour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4 hour"
+                    android:background="@drawable/circular_button_background"
+                    android:textColor="#000000"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 
 </FrameLayout>
+
+<!--
+<TextView
+android:id="@+id/timerTextView"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_centerInParent="true"
+android:text="00:00:00"
+android:textSize="24sp"
+android:textColor="#000000"
+android:fontFamily="sans-serif-medium"/>-->

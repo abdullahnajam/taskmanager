@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:provider/provider.dart';
 import 'package:taskmanager/api/sqlite_helper.dart';
@@ -9,8 +10,11 @@ import 'package:taskmanager/provider/timer_provider.dart';
 import 'package:taskmanager/provider/user_data_provider.dart';
 import 'package:taskmanager/screens/splash_screen.dart';
 
+String timer='';
 void main()async{
+
   WidgetsFlutterBinding.ensureInitialized();
+  HomeWidget.registerBackgroundCallback(backgroundCallback);
   await Firebase.initializeApp(
     /*options: const FirebaseOptions(
         apiKey: "AIzaSyDYBppmJeQuHYQ1HQvz7qvKnhk3wMgJJCY",
@@ -68,6 +72,30 @@ void main()async{
   runApp(const MyApp());
   requestNotificationPermissions();
 }
+
+Future<void> backgroundCallback(uri) async {
+  if (uri.host == 'updatecounter') {
+    print(uri.host);
+    int _counter = 0;
+    /*await HomeWidget.getWidgetData<int>('_counter', defaultValue: 0)
+        .then((value) {
+      _counter = value as int;
+      _counter++;
+    });
+    await HomeWidget.saveWidgetData<int>('_counter', _counter);
+    await HomeWidget.updateWidget(
+        name: 'AppWidgetProvider', iOSName: 'AppWidgetProvider');*/
+  }
+}
+
+/*Future<void> backgroundCallback(Uri uri) async {
+  if (uri.host == 'addHour') {
+    timer='1';
+    final timer = Provider.of<TimerProvider>(context, listen: false);
+
+  }
+}*/
+
 
 class MyApp extends StatelessWidget {
 

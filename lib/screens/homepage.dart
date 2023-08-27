@@ -44,7 +44,7 @@ class _HomepageState extends State<Homepage> {
         int differentInSeconds=await SharedPrefHelper.getSecondDiff();
         int hours=await SharedPrefHelper.getSeconds();
 
-        //( 24 / selected time ) *60 = total minutes in 1 hour of new time
+
         double newMinutesInHour=(24/hours) * 60;
 
 

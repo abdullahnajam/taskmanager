@@ -4,6 +4,7 @@ import 'package:alarm/alarm.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:taskmanager/api/firebase_api.dart';
 import 'package:taskmanager/api/notification_service.dart';
@@ -109,11 +110,77 @@ class _TimerScreenState extends State<TimerScreen> {
     super.dispose();
     WakelockPlus.disable();
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkForWidgetLaunch();
+    HomeWidget.widgetClicked.listen(_launchedFromWidget);
+  }
+
+  void _checkForWidgetLaunch() {
+    HomeWidget.initiallyLaunchedFromHomeWidget().then(_launchedFromWidget);
+  }
+
+  void _launchedFromWidget(Uri? uri) {
+    if (uri != null) {
+      print(uri.host);
+      /*showDialog(
+          context: context,
+          builder: (buildContext) => AlertDialog(
+            title: Text('App started from HomeScreenWidget'),
+            content: Text('Here is the URI: $uri | ${uri.host}'),
+          ));*/
+      if(uri.host=='homeone'){
+        final provider = Provider.of<TimerProvider>(context, listen: false);
+        provider.setSelectedHours(1);
+        provider.setHours(1);
+        provider.setStartPlaying(true);
+      }
+      else if(uri.host=='hometwo'){
+        final provider = Provider.of<TimerProvider>(context, listen: false);
+        provider.setSelectedHours(2);
+        provider.setHours(2);
+        provider.setStartPlaying(true);
+      }
+      else if(uri.host=='homethree'){
+        final provider = Provider.of<TimerProvider>(context, listen: false);
+        provider.setSelectedHours(3);
+        provider.setHours(3);
+        provider.setStartPlaying(true);
+      }
+
+      else if(uri.host=='homefour'){
+        final provider = Provider.of<TimerProvider>(context, listen: false);
+        provider.setSelectedHours(4);
+        provider.setHours(4);
+        provider.setStartPlaying(true);
+      }
+
+    }
+  }
+
+ /* Future _loadData() async {
+
+    try {
+      return Future.wait([
+        HomeWidget.getWidgetData<String>('title', defaultValue: 'Default Title')
+            .then((value) => _titleController.text = value ?? ''),
+        HomeWidget.getWidgetData<String>('message',
+            defaultValue: 'Default Message')
+            .then((value) => _messageController.text = value ?? ''),
+      ]);
+    } on PlatformException catch (exception) {
+      debugPrint('Error Getting Data. $exception');
+    }
+  }*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
+          HomeWidget.getWidgetData<String>('homeOne');
+          _checkForWidgetLaunch();
           showStartTimerDialog(context);
         },
         backgroundColor: Colors.black,

@@ -92,104 +92,32 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
-  String time='';
-  SqliteHelper sqliteHelper=SqliteHelper();
-  bool isPlaying=false;
-  bool changed=false;
-  int totalSeconds=0;
-  int hour=0;
-  int minute=0;
-  int second=0;
-  Map<String,dynamic> row={
-    'id':0,
-    'userId':'',
-    'todoId':'',
-    'todo':'',
-    'state':0,
-    'maxHour':0,
-    'maxMin':0,
-    'doneHour':0,
-    'doneMin':0,
-    'timerHour':0,
-    'timerMin':0,
-    'timerSec':0,
-    'timerRemainingHour':0,
-    'timerRemainingMin':0,
-    'timerRemainingSec':0,
-    'customHour':0,
-    'customSecondsInMinute':0,
-  };
-  SqlDataModel sqlDataModel=SqlDataModel.fromMap(row);
-  Database db = await SqliteHelper.getDatabase();
-  var box = await Hive.openBox('timer');
+  int hours=await SharedPrefHelper.getSeconds();
+  double newMinutesInHour=(24/hours) * 60;
   Timer.periodic(const Duration(seconds: 1), (timer) async {
-    print(timer.tick);
-    int state=await box.get('state');
-    print('hive state $state');
-    //int state=0;
-    /*var box = await Hive.openBox('timer');
-    int state=await box.get('state');
 
-    */if(state==1){
+    String time='';
 
 
+    int totalSeconds =
+        ( DateTime.now().hour * (3600)) +
+            (DateTime.now().minute * 60) +
+            DateTime.now().second;
+    print('1 $totalSeconds');
 
-      if(sqlDataModel.state!=1){
-        changed=false;
-      }
-      if(!changed){
-        await db.transaction((txn) async {
-          List<Map<String, dynamic>> data=await txn.query('Timer');
-          sqlDataModel=SqlDataModel.fromMap(data.last);
 
-        });
-        hour=sqlDataModel.timerHour;
-        minute=sqlDataModel.timerMin;
-        second=sqlDataModel.timerSec;
-        print('data fetched ${sqlDataModel.state}');
-        totalSeconds = sqlDataModel.timerHour * 60 * sqlDataModel.customSecondsInMinute + sqlDataModel.timerMin * sqlDataModel.customSecondsInMinute + sqlDataModel.timerSec;
+    double decimalValue = totalSeconds/(newMinutesInHour*60);
+    int hour = decimalValue.floor();
+    double remainingMinutesDecimal = (decimalValue - hour) * 60;
+    int minutes = remainingMinutesDecimal.floor();
+    int seconds = ((remainingMinutesDecimal - minutes) * 60).floor();
 
-      }
-      if(sqlDataModel.state==1){
-        changed=true;
-        isPlaying=true;
-        if (totalSeconds > 0) {
-          totalSeconds--;
-          hour=totalSeconds ~/ (60 * sqlDataModel.customSecondsInMinute);
-          minute=(totalSeconds % (60 * sqlDataModel.customSecondsInMinute)) ~/ sqlDataModel.customSecondsInMinute;
-          second=(totalSeconds % sqlDataModel.customSecondsInMinute).toInt();
-          time='$hour : $minute : $second';
-          print(time);
-          HomeWidget.saveWidgetData<String>('timerTextView', time);
-          await HomeWidget.updateWidget(name: 'HomeWidgetExampleProvider');
 
-          //await sqliteHelper.update(sqlDataModel);
-          /*provider.setHours(totalSeconds ~/ (60 * secondsInMinutes));
-          provider.setMinutes((totalSeconds % (60 * secondsInMinutes)) ~/ secondsInMinutes);
-          provider.setSeconds(totalSeconds % secondsInMinutes);*/
 
-        } else {
-          isPlaying=false;
-          changed=false;
-          sqlDataModel.state=0;
-          await sqliteHelper.update(sqlDataModel);
-          print('Timer Finished');
+    time= '$hour : $minutes : $seconds';
 
-          NotificationService.showAlarmNotification(id: 1, title: 'Timer Finished', scheduleTime: DateTime.now().add(Duration(seconds: 5)));
-          await SharedPrefHelper.setStartCountDown(false);
-          if (service is AndroidServiceInstance) {
-            if (await service.isForegroundService()) {
-              print('foreground service');
-            }
-            else{
-              FirebaseApi.updateTimeBlockInBackground(sqlDataModel);
-            }
-          }
-
-          //timerSubscription!.cancel();
-        }
-      }
-    }
+    HomeWidget.saveWidgetData<String>('timerTextView', time);
+    await HomeWidget.updateWidget(name: 'HomeWidgetExampleProvider');
 
 
     if (service is AndroidServiceInstance) {
@@ -205,30 +133,7 @@ void onStart(ServiceInstance service) async {
     }
 
     service.on('stopService').listen((event) async{
-      Database db = await SqliteHelper.getDatabase();
 
-
-
-      Map<String,dynamic> row={
-        'id':0,
-        'userId':sqlDataModel.userId,
-        'todoId':sqlDataModel.id,
-        'todo':sqlDataModel.todo,
-        'state':0,
-        'maxHour':sqlDataModel.maxHour,
-        'maxMin':sqlDataModel.maxMin,
-        'doneHour':sqlDataModel.doneHour,
-        'doneMin':sqlDataModel.doneMin,
-        'timerHour':0,
-        'timerMin':0,
-        'timerSec':0,
-        'timerRemainingHour':0,
-        'timerRemainingMin':0,
-        'timerRemainingSec':0,
-        'customHour':sqlDataModel.customHour,
-        'customSecondsInMinute':sqlDataModel.customSecondsInMinute,
-      };
-      await db.insert('Timer', row);
       service.stopSelf();
     });
 
