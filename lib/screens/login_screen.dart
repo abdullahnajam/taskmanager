@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cool_alert/cool_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -119,7 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  InkWell(
+                  if(Platform.isIOS)
+                    InkWell(
                     onTap: ()async{
                       final appleProvider = AppleAuthProvider();
 
