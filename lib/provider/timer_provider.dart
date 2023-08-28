@@ -43,6 +43,9 @@ class TimerProvider extends ChangeNotifier {
 
   void setState(int value) {
     state = value;
+    if(value==0){
+      model=null;
+    }
     notifyListeners();
   }
   void setStartPlaying(bool value) {

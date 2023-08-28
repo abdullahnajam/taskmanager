@@ -716,7 +716,7 @@ Future<void> showStartTimerDialog(BuildContext context) async {
     dropdownData = data;
     if(data.isNotEmpty)
       selectedObject=data.first;
-      time.setTodo(data.first);
+
   });
 
   return showDialog<void>(
@@ -783,7 +783,7 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                                 setState(() {
                                   selectedObject = newValue;
 
-                                  time.setTodo(selectedObject!);
+
                                 });
                               },
                               items: dropdownData.map((obj) {
@@ -867,20 +867,35 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                               flex: 1,
                               child: InkWell(
                                 onTap: (){
-                                  final provider = Provider.of<TimerProvider>(context, listen: false);
-                                  provider.setStartPlaying(true);
-                                  provider.setState(0);
+                                  if(dropdownData.length==0){
+                                    CoolAlert.show(
+                                      context: context,
+                                      type: CoolAlertType.error,
+                                      backgroundColor: primaryColor,
+                                      title: 'No Time Block Found',
+                                      text: 'Please create a time block from time block screen',
 
-                                  provider.setHours(_currentValue);
-                                  provider.setSelectedHours(_currentValue);
+                                      confirmBtnColor: primaryColor,
 
-                                  provider.setMinutes(_currentValue1);
-                                  provider.setSelectedMinutes(_currentValue1);
+                                    );
+                                  }
+                                  else{
+                                    final provider = Provider.of<TimerProvider>(context, listen: false);
+                                    provider.setStartPlaying(true);
+                                    provider.setState(0);
+                                    time.setTodo(selectedObject!);
+                                    provider.setHours(_currentValue);
+                                    provider.setSelectedHours(_currentValue);
 
-                                  provider.setSeconds(_currentValue2);
-                                  provider.setSelectedSeconds(_currentValue2);
+                                    provider.setMinutes(_currentValue1);
+                                    provider.setSelectedMinutes(_currentValue1);
 
-                                  Navigator.pop(context);
+                                    provider.setSeconds(_currentValue2);
+                                    provider.setSelectedSeconds(_currentValue2);
+
+                                    Navigator.pop(context);
+                                  }
+
                                 },
                                 child: Container(
                                   height: 50,

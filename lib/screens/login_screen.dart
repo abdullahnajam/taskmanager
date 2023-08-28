@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart' as kakao;
 import 'package:provider/provider.dart';
+import 'package:taskmanager/api/shared_pref_api.dart';
 import 'package:taskmanager/screens/subscribe_screen.dart';
 
 import '../provider/user_data_provider.dart';
@@ -227,8 +228,14 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.all(20),
               child: InkWell(
-                onTap: (){
-                  provider.setUserId('none');
+                onTap: ()async{
+                  String id=await SharedPrefHelper.getUUID();
+                  print('id = $id');
+                  if(id=='none'){
+                    id=await SharedPrefHelper.setUUID();
+                  }
+                  provider.setUserId(id);
+                  print('id = $id');
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Subscribe()));
 
                 },

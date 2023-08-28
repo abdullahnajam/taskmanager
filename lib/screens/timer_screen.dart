@@ -213,8 +213,20 @@ class _TimerScreenState extends State<TimerScreen> {
                     children: [
                       InkWell(
                         onTap: (){
-                          if(provider.startPlaying){
+                          if(provider.remainingHours==0 && provider.remainingMinutes==0 && provider.remainingSeconds==0){
                             //print('selected todo ${provider.model!.id}');
+                            CoolAlert.show(
+                              context: context,
+                              type: CoolAlertType.error,
+                              backgroundColor: primaryColor,
+                              title: 'Set Time',
+                              text: 'Please set a time for timer either from the presets or from the add dialog',
+
+                              confirmBtnColor: primaryColor,
+
+                            );
+                          }
+                          else{
                             if(provider.model==null){
                               showSelectTodoDialog(context);
                             }
@@ -226,18 +238,7 @@ class _TimerScreenState extends State<TimerScreen> {
 
                               });
                             }
-                          }
-                          else{
-                            CoolAlert.show(
-                                context: context,
-                                type: CoolAlertType.error,
-                                backgroundColor: primaryColor,
-                                title: 'Set Time',
-                                text: 'Please set a time for timer either from the presets or from the add dialog',
 
-                                confirmBtnColor: primaryColor,
-
-                            );
                           }
 
 
@@ -400,6 +401,14 @@ class _TimerScreenState extends State<TimerScreen> {
                                   ),
                                 ],
                               ),
+                              if(timeBlocks.length==0)
+                                Container(
+                                  height: MediaQuery.of(context).size.height*0.2,
+                                  child: Center(
+                                    child: Text('No Time Block Found'),
+                                  ),
+                                )
+                              else
                               ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),

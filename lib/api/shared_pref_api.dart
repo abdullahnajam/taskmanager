@@ -34,4 +34,17 @@ class SharedPrefHelper{
     return diff*3600;
   }
 
+  static Future<String> setUUID()async{
+    final prefs = await SharedPreferences.getInstance();
+    String uuid="user_${DateTime.now().millisecondsSinceEpoch}";
+    await prefs.setString('UUID', uuid);
+    return uuid;
+  }
+
+  static Future<String> getUUID()async{
+    final prefs = await SharedPreferences.getInstance();
+    String id = prefs.getString('UUID')??"none";
+    return id;
+  }
+
 }

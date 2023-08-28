@@ -18,13 +18,12 @@ import '../provider/user_data_provider.dart';
 import 'firebase_api.dart';
 import 'notification_service.dart';
 
-const notificationChannelId = 'my_foreground';
-const notificationId = 888;
+
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
 
-  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  /*const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'my_foreground', // id
     'MY FOREGROUND SERVICE', // title
     description:
@@ -46,7 +45,7 @@ Future<void> initializeService() async {
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
       AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
+      ?.createNotificationChannel(channel);*/
 
   await service.configure(
     androidConfiguration: AndroidConfiguration(
@@ -137,10 +136,10 @@ void onStart(ServiceInstance service) async {
       service.stopSelf();
     });
 
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+    /*final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();*/
 
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
+    /*Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (service is AndroidServiceInstance) {
         if (await service.isForegroundService()) {
           /// OPTIONAL for use custom notification
@@ -195,7 +194,7 @@ void onStart(ServiceInstance service) async {
           "device": device,
         },
       );
-    });
+    });*/
 
     // test using external plugin
     final deviceInfo = DeviceInfoPlugin();
