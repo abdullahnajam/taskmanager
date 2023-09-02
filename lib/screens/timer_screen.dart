@@ -126,33 +126,40 @@ class _TimerScreenState extends State<TimerScreen> {
 
   void _launchedFromWidget(Uri? uri) {
     if (uri != null) {
-      print(uri.host);
-      /*showDialog(
-          context: context,
-          builder: (buildContext) => AlertDialog(
-            title: Text('App started from HomeScreenWidget'),
-            content: Text('Here is the URI: $uri | ${uri.host}'),
-          ));*/
-      if(uri.host=='homeone'){
+      int counter = 0;
+
+      Uri.parse(uri.toString()).queryParameters.forEach((key, value) {
+        if(key.contains('message')) {
+          counter=int.parse(value);
+        }
+      });
+      // print(uri.host);
+      // showDialog(
+      //     context: context,
+      //     builder: (buildContext) => AlertDialog(
+      //       title: Text('App started from HomeScreenWidget'),
+      //       content: Text('Here is the URI: $uri | ${uri.host}'),
+      //     ));
+      if(uri.host=='homeone' || counter==1){
         final provider = Provider.of<TimerProvider>(context, listen: false);
         provider.setSelectedHours(1);
         provider.setHours(1);
         provider.setStartPlaying(true);
       }
-      else if(uri.host=='hometwo'){
+      else if(uri.host=='hometwo' || counter==2){
         final provider = Provider.of<TimerProvider>(context, listen: false);
         provider.setSelectedHours(2);
         provider.setHours(2);
         provider.setStartPlaying(true);
       }
-      else if(uri.host=='homethree'){
+      else if(uri.host=='homethree' || counter ==3){
         final provider = Provider.of<TimerProvider>(context, listen: false);
         provider.setSelectedHours(3);
         provider.setHours(3);
         provider.setStartPlaying(true);
       }
 
-      else if(uri.host=='homefour'){
+      else if(uri.host=='homefour'|| counter==4){
         final provider = Provider.of<TimerProvider>(context, listen: false);
         provider.setSelectedHours(4);
         provider.setHours(4);

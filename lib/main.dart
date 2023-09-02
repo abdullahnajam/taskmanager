@@ -14,6 +14,7 @@ String timer='';
 void main()async{
 
   WidgetsFlutterBinding.ensureInitialized();
+  HomeWidget.setAppGroupId('group.fluttercounter');
   HomeWidget.registerBackgroundCallback(backgroundCallback);
   await Firebase.initializeApp(
     /*options: const FirebaseOptions(
