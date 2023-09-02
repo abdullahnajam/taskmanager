@@ -11,41 +11,13 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:taskmanager/api/shared_pref_api.dart';
-import 'package:taskmanager/api/sqlite_helper.dart';
-import 'package:taskmanager/models/sql_data_model.dart';
 import 'package:home_widget/home_widget.dart';
-import '../provider/user_data_provider.dart';
-import 'firebase_api.dart';
-import 'notification_service.dart';
 
 
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
 
-  /*const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'my_foreground', // id
-    'MY FOREGROUND SERVICE', // title
-    description:
-    'This channel is used for important notifications.', // description
-    importance: Importance.low, // importance must be at low or higher level
-  );
-
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
-
-  if (Platform.isIOS) {
-    await flutterLocalNotificationsPlugin.initialize(
-      const InitializationSettings(
-        iOS: DarwinInitializationSettings()//IOSInitializationSettings(),
-      ),
-    );
-  }
-
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);*/
 
   await service.configure(
     androidConfiguration: AndroidConfiguration(
@@ -54,9 +26,9 @@ Future<void> initializeService() async {
 
       // auto start service
       autoStart: true,
-      isForegroundMode: true,
+      isForegroundMode: false,
 
-      notificationChannelId: 'my_foreground',
+      //notificationChannelId: 'my_foreground',
     ),
     iosConfiguration: IosConfiguration(
       // auto start service
@@ -102,7 +74,7 @@ void onStart(ServiceInstance service) async {
         ( DateTime.now().hour * (3600)) +
             (DateTime.now().minute * 60) +
             DateTime.now().second;
-    print('1 $totalSeconds');
+
 
 
     double decimalValue = totalSeconds/(newMinutesInHour*60);

@@ -38,7 +38,7 @@ class _TimerScreenState extends State<TimerScreen> {
     int totalSeconds = hours * 60 * secondsInMinutes + minutes * secondsInMinutes + seconds;
 
     StreamSubscription? timerSubscription;
-    void updateTimer(Timer timer) {
+    void updateTimer(Timer timer) async{
       if(provider.state==1){
         if (totalSeconds > 0) {
           totalSeconds--;
@@ -59,8 +59,10 @@ class _TimerScreenState extends State<TimerScreen> {
               provider.setStartPlaying(false);
             });
             provider.setState(0);
+
             NotificationService.showAlarmNotification(id: 1, title: 'Timer Finished', scheduleTime: DateTime.now().add(Duration(seconds: 5)));
-            FirebaseApi.updateTimeBlock(context);
+            await FirebaseApi.updateTimeBlock(context);
+            provider.setTodo(null);
           }
           //timerSubscription!.cancel();
         }
@@ -160,20 +162,8 @@ class _TimerScreenState extends State<TimerScreen> {
     }
   }
 
- /* Future _loadData() async {
 
-    try {
-      return Future.wait([
-        HomeWidget.getWidgetData<String>('title', defaultValue: 'Default Title')
-            .then((value) => _titleController.text = value ?? ''),
-        HomeWidget.getWidgetData<String>('message',
-            defaultValue: 'Default Message')
-            .then((value) => _messageController.text = value ?? ''),
-      ]);
-    } on PlatformException catch (exception) {
-      debugPrint('Error Getting Data. $exception');
-    }
-  }*/
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -262,6 +252,7 @@ class _TimerScreenState extends State<TimerScreen> {
                             provider.setHours(0);
                             provider.setMinutes(0);
                             provider.setSeconds(0);
+                            provider.setTodo(null);
                             /*remainingHours=0;
                             remainingMinutes=0;
                             remainingSeconds=0;*/
@@ -312,6 +303,7 @@ class _TimerScreenState extends State<TimerScreen> {
         setState(() {
           provider.setStartPlaying(true);
           provider.setState(0);
+          provider.setTodo(null);
           /*startPlaying=true;
           state=0;*/
 

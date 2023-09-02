@@ -49,7 +49,7 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
 
                 val button4Intent = HomeWidgetLaunchIntent.getActivity(context,
                     MainActivity::class.java, Uri.parse("myAppWidget://homeFour"))
-                setOnClickPendingIntent(R.id.hourThree, button4Intent)
+                setOnClickPendingIntent(R.id.hourFour, button4Intent)
             }
             appWidgetManager.updateAppWidget(widgetId, views)
         }

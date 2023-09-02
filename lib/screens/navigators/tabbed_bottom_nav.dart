@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:taskmanager/screens/calendar_screen.dart';
 import 'package:taskmanager/screens/homepage.dart';
 import 'package:taskmanager/screens/time_block_screen.dart';
@@ -34,7 +35,7 @@ class _BottomNavigationState extends State<TabbedBottomNavBar> with SingleTicker
     ];
     _tabController = new TabController(vsync: this, length: _children.length);
     _tabController!.addListener(_handleTabChange);
-    initializeService();
+
 
   }
 
@@ -44,11 +45,7 @@ class _BottomNavigationState extends State<TabbedBottomNavBar> with SingleTicker
     });
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
+
 
 
   @override
@@ -63,6 +60,23 @@ class _BottomNavigationState extends State<TabbedBottomNavBar> with SingleTicker
       _currentIndex = _tabController!.index;
       print('Current Tab Index: $_currentIndex');
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkForWidgetLaunch();
+    HomeWidget.widgetClicked.listen(_launchedFromWidget);
+  }
+
+  void _checkForWidgetLaunch() {
+    HomeWidget.initiallyLaunchedFromHomeWidget().then(_launchedFromWidget);
+  }
+
+  void _launchedFromWidget(Uri? uri) {
+    if (uri != null) {
+      _tabController!.animateTo(2);
+    }
   }
 
   @override

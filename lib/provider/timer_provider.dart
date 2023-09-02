@@ -14,7 +14,7 @@ class TimerProvider extends ChangeNotifier {
     remainingHours = value;
     notifyListeners();
   }
-  void setTodo(TimeBlockModel value) {
+  void setTodo(TimeBlockModel? value) {
     model = value;
     notifyListeners();
   }
@@ -43,9 +43,9 @@ class TimerProvider extends ChangeNotifier {
 
   void setState(int value) {
     state = value;
-    if(value==0){
+    /*if(value==0){
       model=null;
-    }
+    }*/
     notifyListeners();
   }
   void setStartPlaying(bool value) {

@@ -39,40 +39,40 @@ class _HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      getHours().then((value)async{
-        int differentInSeconds=await SharedPrefHelper.getSecondDiff();
-        int hours=await SharedPrefHelper.getSeconds();
+    getHours().then((value)async{
+      int hour=await SharedPrefHelper.getSeconds();
 
 
-        double newMinutesInHour=(24/hours) * 60;
+      double newMinutesInHour=(24/hour) * 60;
+
+      Timer.periodic(const Duration(milliseconds: 200), (Timer t) {
+        setState(() {
+          DateTime now = DateTime(
+              DateTime.now().year,
+              DateTime.now().month,
+              DateTime.now().day,
+              DateTime.now().hour,
+              DateTime.now().minute,
+              DateTime.now().second
+          );
+          if(hour==24){
+            clock= '${now.hour} : ${now.minute} : ${now.second}';
+          }
+          else{
+
+            //print(now);
+            double totalSeconds = (now.hour * 3600 + now.minute * 60 + now.second)/(newMinutesInHour*60);
 
 
 
+            //double decimalValue = totalSeconds/(newMinutesInHour*60);
+            int hours = totalSeconds.floor();
+            //print('total $totalSeconds');
+            double remainingMinutesDecimal = (totalSeconds - hours) * 60;
+            int minutes = remainingMinutesDecimal.floor();
+            double seconds = ((remainingMinutesDecimal - minutes) * 60);
 
-        print(differentInSeconds);
-        Timer.periodic(const Duration(seconds: 1), (Timer t) {
-          if(mounted){
-            setState(() {
-
-              int totalSeconds =
-                  ( DateTime.now().hour * (3600)) +
-                      (DateTime.now().minute * 60) +
-                      DateTime.now().second;
-              print('1 $totalSeconds');
-
-              //totalSeconds=totalSeconds+differentInSeconds;
-
-              double decimalValue = totalSeconds/(newMinutesInHour*60);
-              int hours = decimalValue.floor();
-              double remainingMinutesDecimal = (decimalValue - hours) * 60;
-              int minutes = remainingMinutesDecimal.floor();
-              int seconds = ((remainingMinutesDecimal - minutes) * 60).floor();
-
-
-              TimeApi.convertBackToOriginalTime(hours, minutes);
-              clock= '$hours : $minutes : $seconds';
-            });
+            clock= '$hours : $minutes : ${seconds.toInt()}';
           }
         });
       });

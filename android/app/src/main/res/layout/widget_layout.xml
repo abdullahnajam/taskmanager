@@ -24,7 +24,9 @@
 
         <!-- Button Container - Aligned to the right -->
         <LinearLayout
-
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -42,15 +44,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="1 hour"
+                    android:textSize="10sp"
                     android:background="@drawable/circular_button_background"
                     android:textColor="#000000"
-                    android:layout_marginRight="8dp" />
+                    android:layout_marginRight="4dp" />
 
                 <Button
                     android:id="@+id/hourTwo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2 hour"
+                    android:textSize="10sp"
                     android:background="@drawable/circular_button_background"
                     android:textColor="#000000" />
             </LinearLayout>
@@ -70,7 +74,8 @@
                     android:text="3 hour"
                     android:background="@drawable/circular_button_background"
                     android:textColor="#000000"
-                    android:layout_marginTop="8dp"
+                    android:textSize="10sp"
+                    android:layout_marginTop="2dp"
                     android:layout_marginRight="8dp" />
 
                 <Button
@@ -78,9 +83,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="4 hour"
+                    android:textSize="10sp"
                     android:background="@drawable/circular_button_background"
                     android:textColor="#000000"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="2dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

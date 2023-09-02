@@ -883,7 +883,8 @@ Future<void> showStartTimerDialog(BuildContext context) async {
                                     final provider = Provider.of<TimerProvider>(context, listen: false);
                                     provider.setStartPlaying(true);
                                     provider.setState(0);
-                                    time.setTodo(selectedObject!);
+
+                                    print('selected object ${selectedObject!.todo}');
                                     provider.setHours(_currentValue);
                                     provider.setSelectedHours(_currentValue);
 
@@ -892,6 +893,7 @@ Future<void> showStartTimerDialog(BuildContext context) async {
 
                                     provider.setSeconds(_currentValue2);
                                     provider.setSelectedSeconds(_currentValue2);
+                                    provider.setTodo(selectedObject!);
 
                                     Navigator.pop(context);
                                   }

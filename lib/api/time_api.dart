@@ -100,7 +100,7 @@ class TimeApi{
         ( DateTime.now().hour * (3600)) +
             (DateTime.now().minute * 60) +
             DateTime.now().second;
-    print('1 $totalSeconds');
+
 
     //totalSeconds=totalSeconds+differentInSeconds;
 
@@ -161,7 +161,7 @@ class TimeApi{
         ( hour * (60*60)) +
             (minute * 60) +
             0;
-    print('1 $totalSeconds');*/
+   */
 
 
     double decimalValue = newMinutesInHour;

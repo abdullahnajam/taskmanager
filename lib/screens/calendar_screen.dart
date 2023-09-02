@@ -53,11 +53,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
         final DateTime startTime = DateTime.fromMillisecondsSinceEpoch(model.createdAt);
 
         if(startTime.isBefore(today)){
-          meetings.add(Meeting(model.todo, startTime, startTime, (model.doneHour==model.maxHour && model.maxMin==model.maxMin)?Colors.green:Colors.red, true));
+          meetings.add(Meeting(model.todo, startTime, startTime, (model.doneHour==model.maxHour && model.doneMin==model.maxMin)?Colors.green:Colors.red, true));
 
         }
         else{
-          meetings.add(Meeting(model.todo, startTime, startTime, (model.doneHour==model.maxHour && model.maxMin==model.maxMin)?Colors.green:Colors.orange, true));
+          meetings.add(Meeting(model.todo, startTime, startTime, (model.doneHour==model.maxHour && model.doneMin==model.maxMin)?Colors.green:Colors.orange, true));
         }
       });
     });

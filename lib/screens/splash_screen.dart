@@ -31,13 +31,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void navigationPage() async{
-    var box = await Hive.openBox('timer');
    /* var box = await Hive.openBox('timer');
     box.put('todo', 'David');*/
     await FirebaseApi.setScheduleStatus();
     await SharedPrefHelper.setStartCountDown(false);
     //await FirebaseApi.updateTodos();
     //print(UserApi.instance.toString());
+    initializeService();
     if(FirebaseAuth.instance.currentUser!=null){
       print('here');
       final provider = Provider.of<UserDataProvider>(context, listen: false);

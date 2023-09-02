@@ -283,7 +283,9 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(model.todo,style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w500),),
-              if(model.doneHour==0)
+              if(model.doneHour==model.maxHour && model.doneMin==model.maxMin)
+    Icon(Icons.check_circle,color: Colors.green,size: 15,)
+    else
               InkWell(
                 onTap: (){
                   CoolAlert.show(
@@ -308,8 +310,8 @@ class _TimeBlockScreenState extends State<TimeBlockScreen> {
                 },
                 child: const Icon(Icons.edit_outlined,size: 15,),
               )
-              else
-                Icon(Icons.check_circle,color: Colors.green,size: 15,)
+
+
             ],
           ),
           Text('Invest ${model.doneHour} Hour/ ${model.maxHour} Hours'),
