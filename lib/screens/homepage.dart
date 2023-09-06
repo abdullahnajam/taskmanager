@@ -46,35 +46,37 @@ class _HomepageState extends State<Homepage> {
       double newMinutesInHour=(24/hour) * 60;
 
       Timer.periodic(const Duration(milliseconds: 200), (Timer t) {
-        setState(() {
-          DateTime now = DateTime(
-              DateTime.now().year,
-              DateTime.now().month,
-              DateTime.now().day,
-              DateTime.now().hour,
-              DateTime.now().minute,
-              DateTime.now().second
-          );
-          if(hour==24){
-            clock= '${now.hour} : ${now.minute} : ${now.second}';
-          }
-          else{
+        if(mounted){
+          setState(() {
+            DateTime now = DateTime(
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+                DateTime.now().hour,
+                DateTime.now().minute,
+                DateTime.now().second
+            );
+            if(hour==24){
+              clock= '${now.hour} : ${now.minute} : ${now.second}';
+            }
+            else{
 
-            //print(now);
-            double totalSeconds = (now.hour * 3600 + now.minute * 60 + now.second)/(newMinutesInHour*60);
+              //print(now);
+              double totalSeconds = (now.hour * 3600 + now.minute * 60 + now.second)/(newMinutesInHour*60);
 
 
 
-            //double decimalValue = totalSeconds/(newMinutesInHour*60);
-            int hours = totalSeconds.floor();
-            //print('total $totalSeconds');
-            double remainingMinutesDecimal = (totalSeconds - hours) * 60;
-            int minutes = remainingMinutesDecimal.floor();
-            double seconds = ((remainingMinutesDecimal - minutes) * 60);
+              //double decimalValue = totalSeconds/(newMinutesInHour*60);
+              int hours = totalSeconds.floor();
+              //print('total $totalSeconds');
+              double remainingMinutesDecimal = (totalSeconds - hours) * 60;
+              int minutes = remainingMinutesDecimal.floor();
+              double seconds = ((remainingMinutesDecimal - minutes) * 60);
 
-            clock= '$hours : $minutes : ${seconds.toInt()}';
-          }
-        });
+              clock= '$hours : $minutes : ${seconds.toInt()}';
+            }
+          });
+        }
       });
     });
 

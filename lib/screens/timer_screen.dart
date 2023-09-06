@@ -113,7 +113,7 @@ class _TimerScreenState extends State<TimerScreen> {
     WakelockPlus.disable();
   }
 
-  @override
+  /*@override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _checkForWidgetLaunch();
@@ -125,49 +125,53 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   void _launchedFromWidget(Uri? uri) {
-    if (uri != null) {
-      int counter = 0;
+    print('uri $uri');
+    if(mounted){
+      if (uri != null) {
+        int counter = 0;
 
-      Uri.parse(uri.toString()).queryParameters.forEach((key, value) {
-        if(key.contains('message')) {
-          counter=int.parse(value);
+        Uri.parse(uri.toString()).queryParameters.forEach((key, value) {
+          if(key.contains('message')) {
+            counter=int.parse(value);
+          }
+        });
+        // print(uri.host);
+        // showDialog(
+        //     context: context,
+        //     builder: (buildContext) => AlertDialog(
+        //       title: Text('App started from HomeScreenWidget'),
+        //       content: Text('Here is the URI: $uri | ${uri.host}'),
+        //     ));
+        if(uri.host=='homeone' || counter==1){
+          final provider = Provider.of<TimerProvider>(context, listen: false);
+          provider.setSelectedHours(1);
+          provider.setHours(1);
+          provider.setStartPlaying(true);
         }
-      });
-      // print(uri.host);
-      // showDialog(
-      //     context: context,
-      //     builder: (buildContext) => AlertDialog(
-      //       title: Text('App started from HomeScreenWidget'),
-      //       content: Text('Here is the URI: $uri | ${uri.host}'),
-      //     ));
-      if(uri.host=='homeone' || counter==1){
-        final provider = Provider.of<TimerProvider>(context, listen: false);
-        provider.setSelectedHours(1);
-        provider.setHours(1);
-        provider.setStartPlaying(true);
-      }
-      else if(uri.host=='hometwo' || counter==2){
-        final provider = Provider.of<TimerProvider>(context, listen: false);
-        provider.setSelectedHours(2);
-        provider.setHours(2);
-        provider.setStartPlaying(true);
-      }
-      else if(uri.host=='homethree' || counter ==3){
-        final provider = Provider.of<TimerProvider>(context, listen: false);
-        provider.setSelectedHours(3);
-        provider.setHours(3);
-        provider.setStartPlaying(true);
-      }
+        else if(uri.host=='hometwo' || counter==2){
+          final provider = Provider.of<TimerProvider>(context, listen: false);
+          provider.setSelectedHours(2);
+          provider.setHours(2);
+          provider.setStartPlaying(true);
+        }
+        else if(uri.host=='homethree' || counter ==3){
+          final provider = Provider.of<TimerProvider>(context, listen: false);
+          provider.setSelectedHours(3);
+          provider.setHours(3);
+          provider.setStartPlaying(true);
+        }
 
-      else if(uri.host=='homefour'|| counter==4){
-        final provider = Provider.of<TimerProvider>(context, listen: false);
-        provider.setSelectedHours(4);
-        provider.setHours(4);
-        provider.setStartPlaying(true);
-      }
+        else if(uri.host=='homefour'|| counter==4){
+          final provider = Provider.of<TimerProvider>(context, listen: false);
+          provider.setSelectedHours(4);
+          provider.setHours(4);
+          provider.setStartPlaying(true);
+        }
 
+      }
     }
-  }
+
+  }*/
 
 
 
@@ -176,8 +180,7 @@ class _TimerScreenState extends State<TimerScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          HomeWidget.getWidgetData<String>('homeOne');
-          _checkForWidgetLaunch();
+
           showStartTimerDialog(context);
         },
         backgroundColor: Colors.black,
