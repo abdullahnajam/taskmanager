@@ -30,7 +30,7 @@
 	<array>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string></string>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
@@ -38,6 +38,14 @@
 				<string>taskmanager://counterAction</string>
 			</array>
 		</dict>
+		<dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.249661969271-cr4eppb2jt4d5radnumshot92mpsr2jq</string>
+            </array>
+        </dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
